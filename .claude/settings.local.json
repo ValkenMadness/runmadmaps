@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/user/.claude/projects/e--14---RMM-Official-02---The-Website-Build-03---THE-OFFICIAL-BUILD/memory/**)"
+    ]
+  }
+}

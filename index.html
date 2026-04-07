@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Run Mad Maps — Trail Intelligence for the Cape Peninsula</title>
+  <meta name="description" content="Trail intelligence for the Cape Peninsula, South Africa. Route grading, fitness scoring, and race readiness — built for these mountains.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Run Mad Maps">
+  <meta property="og:description" content="Trail intelligence for the Cape Peninsula. Something is coming.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://runmadmaps.com">
+  <meta property="og:image" content="https://runmadmaps.com/public/images/og-image.png">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Run Mad Maps">
+  <meta name="twitter:description" content="Trail intelligence for the Cape Peninsula. Something is coming.">
+  <meta name="twitter:image" content="https://runmadmaps.com/public/images/og-image.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/public/favicon.ico">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+  <main class="landing">
+    <div class="content">
+      <div class="logo-area">
+        <!-- V: Replace this with your actual logo -->
+        <!-- If SVG: paste the <svg> markup directly here -->
+        <!-- If PNG: use <img src="/public/images/logo.png" alt="Run Mad Maps" class="logo-img"> -->
+        <img src="/public/images/logo.svg" alt="Run Mad Maps" class="logo-img">
+        <h1 class="brand-name">Run Mad Maps</h1>
+      </div>
+
+      <p class="tagline">Trail intelligence for the Cape Peninsula.<br>Something is coming.</p>
+
+      <div class="form-area" id="formArea">
+        <div class="form-row" id="formRow">
+          <input
+            type="email"
+            id="emailInput"
+            placeholder="your email"
+            autocomplete="email"
+            aria-label="Email address"
+          >
+          <button type="button" id="submitBtn">Join</button>
+        </div>
+        <div class="consent" id="consentRow">
+          <input type="checkbox" id="consentCheckbox">
+          <label for="consentCheckbox">I agree to receive emails from Run Mad Maps. Unsubscribe anytime. POPIA compliant.</label>
+        </div>
+        <p class="error-msg" id="errorMsg"></p>
+        <p class="success-msg" id="successMsg">You're in. Watch this space.</p>
+      </div>
+    </div>
+
+    <footer class="footer-line">
+      Cape Town, South Africa &middot; 2026
+    </footer>
+  </main>
+
+  <script src="/scripts/main.js"></script>
+</body>
+</html>
