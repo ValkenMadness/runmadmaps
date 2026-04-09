@@ -60,7 +60,9 @@
 .nav-logo img {
     height: 28px;
     width: auto;
-    filter: brightness(0) invert(1);
+    background: var(--color-light);
+    padding: 3px 6px;
+    border-radius: 2px;
 }
 
 .nav-brand {
@@ -157,7 +159,9 @@
 .footer-logo {
     height: 32px;
     width: auto;
-    filter: brightness(0) invert(1);
+    background: var(--color-light);
+    padding: 4px 8px;
+    border-radius: 2px;
     margin-bottom: 0.5rem;
 }
 
