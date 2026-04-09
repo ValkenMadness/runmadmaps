@@ -97,3 +97,36 @@
     }
   });
 })();
+
+// Admin bypass gate
+(function() {
+    var params = new URLSearchParams(window.location.search);
+
+    if (params.get('admin') === 'madmaps') {
+        localStorage.setItem('rmm_admin', 'true');
+        window.history.replaceState({}, '', window.location.pathname);
+    }
+
+    if (params.get('admin') === 'reset') {
+        localStorage.removeItem('rmm_admin');
+        window.history.replaceState({}, '', window.location.pathname);
+    }
+
+    if (localStorage.getItem('rmm_admin') === 'true') {
+        var curtain = document.querySelector('.curtain');
+        if (curtain) {
+            var adminNav = document.createElement('nav');
+            adminNav.className = 'admin-nav';
+            adminNav.innerHTML = [
+                '<div class="admin-nav-label">ADMIN</div>',
+                '<div class="admin-nav-links">',
+                '    <a href="/map">Map</a>',
+                '    <a href="/about">About</a>',
+                '    <a href="/shop">Shop</a>',
+                '    <a href="/intelligence">Intelligence</a>',
+                '</div>'
+            ].join('');
+            curtain.appendChild(adminNav);
+        }
+    }
+})();

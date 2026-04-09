@@ -253,3 +253,48 @@ body {
     font-size: 11px;
   }
 }
+
+/* ==========================================================================
+   Admin bypass navigation
+   ========================================================================== */
+
+.admin-nav {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(23, 26, 20, 0.2);
+  text-align: center;
+}
+
+.admin-nav-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: rgba(23, 26, 20, 0.4);
+  margin-bottom: 0.75rem;
+}
+
+.admin-nav-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.admin-nav-links a {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  color: #171A14;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 0.2s ease;
+}
+
+.admin-nav-links a:hover {
+  color: #FF4E50;
+}
+
+@media (max-width: 480px) {
+  .admin-nav-links {
+    gap: 1.25rem;
+  }
+}

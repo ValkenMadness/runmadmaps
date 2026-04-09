@@ -1,0 +1,314 @@
+/* ============================================
+   RUN MAD MAPS — Shared Component Styles
+   ============================================ */
+
+/* --- CSS Variables --- */
+:root {
+    --color-dark: #171A14;
+    --color-light: #FFF1D4;
+    --color-white: #FFFFFF;
+    --color-accent: #FF4E50;
+    --color-muted: rgba(23, 26, 20, 0.5);
+    --font-mono: 'Space Mono', monospace;
+    --nav-height: 64px;
+}
+
+/* --- Reset for page shells --- */
+.page-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-light);
+    color: var(--color-dark);
+    font-family: var(--font-mono);
+}
+
+.page-content {
+    flex: 1;
+    padding-top: var(--nav-height);
+}
+
+/* --- Navigation --- */
+.site-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--color-dark);
+    z-index: 1000;
+    border-bottom: 2px solid var(--color-accent);
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+.nav-logo img {
+    height: 28px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.nav-brand {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-white);
+    letter-spacing: 0.15em;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--color-accent);
+}
+
+/* Mobile hamburger */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.nav-toggle span {
+    width: 24px;
+    height: 2px;
+    background: var(--color-white);
+    transition: all 0.3s ease;
+}
+
+.nav-toggle.open span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.nav-toggle.open span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.open span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* --- Footer --- */
+.site-footer {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: 3rem 1.5rem 2rem;
+}
+
+.footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    text-align: center;
+}
+
+.footer-logo {
+    height: 32px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    margin-bottom: 0.5rem;
+}
+
+.footer-tagline {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.05em;
+    font-style: italic;
+}
+
+.footer-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-links a {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: var(--color-accent);
+}
+
+.footer-legal {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.03em;
+}
+
+.footer-legal p {
+    margin: 0.25rem 0;
+}
+
+.footer-location {
+    margin-top: 0.25rem;
+}
+
+/* --- Shared Page Section Styles --- */
+.section {
+    padding: 4rem 1.5rem;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.section-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 0.75rem;
+}
+
+.section-heading {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin-bottom: 1.5rem;
+    line-height: 1.3;
+}
+
+.section-body {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--color-dark);
+}
+
+.section-body p {
+    margin-bottom: 1rem;
+}
+
+/* --- Coming Soon Badge --- */
+.coming-soon-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    padding: 0.25rem 0.75rem;
+    border-radius: 2px;
+}
+
+/* --- Placeholder Card --- */
+.placeholder-card {
+    border: 1px solid rgba(23, 26, 20, 0.15);
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.4);
+    margin-bottom: 1.5rem;
+}
+
+.placeholder-card h3 {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--color-dark);
+}
+
+.placeholder-card p {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+}
+
+/* --- Mobile Responsive --- */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        background: var(--color-dark);
+        flex-direction: column;
+        padding: 1.5rem;
+        gap: 1rem;
+        border-bottom: 2px solid var(--color-accent);
+    }
+
+    .nav-links.open {
+        display: flex;
+    }
+
+    .nav-link {
+        font-size: 0.85rem;
+        padding: 0.5rem 0;
+    }
+
+    .section-heading {
+        font-size: 1.25rem;
+    }
+
+    .footer-links {
+        gap: 1.25rem;
+    }
+
+    .admin-nav-links {
+        gap: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-brand {
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+    }
+
+    .section {
+        padding: 3rem 1rem;
+    }
+}
