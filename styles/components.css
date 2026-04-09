@@ -91,6 +91,22 @@
     color: var(--color-accent);
 }
 
+/* Auth-gated nav link */
+.nav-link-gated {
+    position: relative;
+}
+
+.nav-link-gated::after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--color-accent);
+    border-radius: 50%;
+    position: absolute;
+    top: -2px;
+    right: -8px;
+}
+
 /* Mobile hamburger */
 .nav-toggle {
     display: none;
