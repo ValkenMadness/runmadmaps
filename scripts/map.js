@@ -21,28 +21,28 @@ var TRAIL_STYLES = {
     path: {
         color: '#3a3428',
         dasharray: [4, 3],
-        width: { z10: 0.8, z13: 1.5, z16: 3 },
+        width: { z10: 0.25, z13: 0.5, z16: 1.0 },
         opacity: { z10: 0.5, z13: 0.7, z16: 0.9 },
         minzoom: null
     },
     footway: {
         color: '#8a7e60',
         dasharray: null,
-        width: { z13: 0.5, z16: 1.5 },
+        width: { z13: 0.15, z16: 0.5 },
         opacity: 0.5,
         minzoom: 13
     },
     steps: {
         color: '#8a7e60',
         dasharray: [1, 2],
-        width: { z14: 0.5, z17: 1.5 },
+        width: { z14: 0.15, z17: 0.5 },
         opacity: 0.4,
         minzoom: 14
     },
     track: {
         color: '#5a5240',
         dasharray: null,
-        width: { z10: 0.6, z13: 1.2, z16: 2.5 },
+        width: { z10: 0.2, z13: 0.4, z16: 0.8 },
         opacity: { z10: 0.3, z13: 0.5, z16: 0.7 },
         minzoom: null
     }
@@ -159,7 +159,7 @@ function addDataLayers(config) {
 
     map.addSource('rmm-peaks', {
         type: 'geojson',
-        data: '/data/peaks.geojson'
+        data: '/public/data/peaks.geojson'
     });
 
     // Trail layers — ordered bottom to top
@@ -273,70 +273,74 @@ function addDataLayers(config) {
     }
 
     // Peak markers — T1 (icon only, lower zooms)
-    map.addLayer({
-        id: 'rmm-peaks-t1',
-        type: 'symbol',
-        source: 'rmm-peaks',
-        minzoom: PEAK_STYLES.t1.minzoom,
-        maxzoom: PEAK_STYLES.t1.maxzoom,
-        layout: {
-            'icon-image': 'peak-s1',
-            'icon-size': [
-                'interpolate', ['linear'], ['zoom'],
-                8,  PEAK_STYLES.t1.iconSize.z8,
-                11, PEAK_STYLES.t1.iconSize.z11,
-                13, PEAK_STYLES.t1.iconSize.z13
-            ],
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': false,
-            'symbol-sort-key': [
-                'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
-            ]
-        }
-    });
+    if (map.hasImage('peak-s1')) {
+        map.addLayer({
+            id: 'rmm-peaks-t1',
+            type: 'symbol',
+            source: 'rmm-peaks',
+            minzoom: PEAK_STYLES.t1.minzoom,
+            maxzoom: PEAK_STYLES.t1.maxzoom,
+            layout: {
+                'icon-image': 'peak-s1',
+                'icon-size': [
+                    'interpolate', ['linear'], ['zoom'],
+                    8,  PEAK_STYLES.t1.iconSize.z8,
+                    11, PEAK_STYLES.t1.iconSize.z11,
+                    13, PEAK_STYLES.t1.iconSize.z13
+                ],
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': false,
+                'symbol-sort-key': [
+                    'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
+                ]
+            }
+        });
+    }
 
     // Peak markers — T2 (icon + name + elevation, higher zooms)
-    map.addLayer({
-        id: 'rmm-peaks-t2',
-        type: 'symbol',
-        source: 'rmm-peaks',
-        minzoom: PEAK_STYLES.t2.minzoom,
-        layout: {
-            'icon-image': 'peak-s2',
-            'icon-size': [
-                'interpolate', ['linear'], ['zoom'],
-                13, PEAK_STYLES.t2.iconSize.z13,
-                15, PEAK_STYLES.t2.iconSize.z15,
-                18, PEAK_STYLES.t2.iconSize.z18
-            ],
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': false,
-            'text-field': [
-                'case',
-                ['has', 'ele'],
-                ['concat', ['get', 'name'], '\n', ['to-string', ['get', 'ele']], 'm'],
-                ['get', 'name']
-            ],
-            'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
-            'text-size': [
-                'interpolate', ['linear'], ['zoom'],
-                13, PEAK_STYLES.t2.textSize.z13,
-                16, PEAK_STYLES.t2.textSize.z16
-            ],
-            'text-offset': [0, 1.8],
-            'text-anchor': 'top',
-            'text-max-width': 8,
-            'text-optional': true,
-            'symbol-sort-key': [
-                'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
-            ]
-        },
-        paint: {
-            'text-color': PEAK_STYLES.textColor,
-            'text-halo-color': PEAK_STYLES.textHaloColor,
-            'text-halo-width': PEAK_STYLES.textHaloWidth
-        }
-    });
+    if (map.hasImage('peak-s2')) {
+        map.addLayer({
+            id: 'rmm-peaks-t2',
+            type: 'symbol',
+            source: 'rmm-peaks',
+            minzoom: PEAK_STYLES.t2.minzoom,
+            layout: {
+                'icon-image': 'peak-s2',
+                'icon-size': [
+                    'interpolate', ['linear'], ['zoom'],
+                    13, PEAK_STYLES.t2.iconSize.z13,
+                    15, PEAK_STYLES.t2.iconSize.z15,
+                    18, PEAK_STYLES.t2.iconSize.z18
+                ],
+                'icon-allow-overlap': true,
+                'icon-ignore-placement': false,
+                'text-field': [
+                    'case',
+                    ['has', 'ele'],
+                    ['concat', ['get', 'name'], '\n', ['to-string', ['get', 'ele']], 'm'],
+                    ['get', 'name']
+                ],
+                'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+                'text-size': [
+                    'interpolate', ['linear'], ['zoom'],
+                    13, PEAK_STYLES.t2.textSize.z13,
+                    16, PEAK_STYLES.t2.textSize.z16
+                ],
+                'text-offset': [0, 1.8],
+                'text-anchor': 'top',
+                'text-max-width': 8,
+                'text-optional': true,
+                'symbol-sort-key': [
+                    'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
+                ]
+            },
+            paint: {
+                'text-color': PEAK_STYLES.textColor,
+                'text-halo-color': PEAK_STYLES.textHaloColor,
+                'text-halo-width': PEAK_STYLES.textHaloWidth
+            }
+        });
+    }
 }
 
 // --- Map initialisation ---
@@ -386,22 +390,29 @@ function initMap(containerId) {
                     'star-intensity': 0.15
                 });
 
-                // 2. Load peak icons, then add all data layers
-                map.loadImage('/public/icons/peaks/peak-generic-s1.png', function(errT1, imageT1) {
-                    if (errT1) {
-                        console.warn('RMM: T1 icon failed to load');
-                    } else {
-                        map.addImage('peak-s1', imageT1);
-                    }
+                // 2. Load peak icons in parallel, then add all data layers
+                var iconsToLoad = [
+                    { id: 'peak-s1', url: '/public/icons/peaks/peak-generic-s1.png' },
+                    { id: 'peak-s2', url: '/public/icons/peaks/peak-generic-s2.png' }
+                ];
+                var iconsLoaded = 0;
+                var totalIcons = iconsToLoad.length;
 
-                    map.loadImage('/public/icons/peaks/peak-generic-s2.png', function(errT2, imageT2) {
-                        if (errT2) {
-                            console.warn('RMM: T2 icon failed to load');
-                        } else {
-                            map.addImage('peak-s2', imageT2);
-                        }
-
+                function onIconAttemptComplete() {
+                    iconsLoaded++;
+                    if (iconsLoaded === totalIcons) {
                         addDataLayers(config);
+                    }
+                }
+
+                iconsToLoad.forEach(function(icon) {
+                    map.loadImage(icon.url, function(error, image) {
+                        if (error) {
+                            console.warn('RMM: Failed to load icon ' + icon.id);
+                        } else {
+                            map.addImage(icon.id, image);
+                        }
+                        onIconAttemptComplete();
                     });
                 });
 
