@@ -1533,6 +1533,30 @@
     margin: 0 0 1rem 0;
 }
 
+/* --- PRIVACY PAGE --- */
+.privacy-content {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.privacy-content p {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #171A14;
+    margin-bottom: 1.25rem;
+}
+
+.privacy-content p + p {
+    color: #666;
+}
+
+.privacy-content a {
+    color: #FF4E50;
+    text-decoration: underline;
+}
+
 /* Event page responsive */
 @media (max-width: 768px) {
     .event-layout {

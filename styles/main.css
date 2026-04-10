@@ -108,6 +108,33 @@ body {
   animation: fadeIn 0.6s 0.8s forwards;
 }
 
+.name-row {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.name-row input[type="text"] {
+  width: 100%;
+  background: rgba(23, 26, 20, 0.04);
+  border: 1.5px solid var(--dark-olive);
+  border-radius: 3px;
+  padding: 13px 14px;
+  color: var(--dark-olive);
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.name-row input[type="text"]:focus {
+  border-color: var(--sunset);
+}
+
+.name-row input[type="text"]::placeholder {
+  color: var(--muted-olive);
+  opacity: 0.6;
+}
+
 .form-row {
   display: flex;
   width: 100%;
@@ -182,6 +209,11 @@ body {
   color: var(--muted-olive);
   line-height: 1.5;
   letter-spacing: 0.3px;
+}
+
+.consent label a {
+  color: var(--sunset);
+  text-decoration: underline;
 }
 
 /* --- Messages --- */

@@ -43,6 +43,17 @@
       <p class="tagline">Trail intelligence for the Cape Peninsula.<br>Something is coming.</p>
 
       <div class="form-area" id="formArea">
+        <div class="name-row" id="nameRow">
+          <input
+            type="text"
+            id="nameInput"
+            name="name"
+            placeholder="your first name"
+            autocomplete="given-name"
+            aria-label="First name"
+            required
+          >
+        </div>
         <div class="form-row" id="formRow">
           <input
             type="email"
@@ -55,7 +66,7 @@
         </div>
         <div class="consent" id="consentRow">
           <input type="checkbox" id="consentCheckbox">
-          <label for="consentCheckbox">I agree to receive emails from Run Mad Maps. Unsubscribe anytime. POPIA compliant.</label>
+          <label for="consentCheckbox">I agree to receive trail updates, event announcements, and news from Run Mad Maps. You can unsubscribe at any time. Read our <a href="/privacy">Privacy Policy</a>.</label>
         </div>
         <p class="error-msg" id="errorMsg"></p>
         <p class="success-msg" id="successMsg">You're in. Watch this space.</p>

@@ -20,20 +20,20 @@ export default async function handler(req, res) {
   var body = req.body;
 
   // Validate input
-  if (!body || !body.email || !body.consent) {
-    return res.status(400).json({ error: 'Email and consent required.' });
+  if (!body || !body.name || !body.name.trim()) {
+    return res.status(400).json({ error: 'Name is required.' });
   }
 
+  if (!body.email) {
+    return res.status(400).json({ error: 'Email is required.' });
+  }
+
+  var name = body.name.trim();
   var email = body.email.trim().toLowerCase();
 
   // Basic email validation
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Invalid email format.' });
-  }
-
-  // Consent must be true
-  if (body.consent !== true) {
-    return res.status(400).json({ error: 'Consent required.' });
   }
 
   // Environment variables
@@ -57,7 +57,8 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         email: email,
-        consent: true,
+        first_name: name,
+        consent_given: true,
         source: 'landing_page'
       })
     });

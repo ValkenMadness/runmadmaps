@@ -6,6 +6,8 @@
   'use strict';
 
   // --- DOM ---
+  var nameInput = document.getElementById('nameInput');
+  var nameRow = document.getElementById('nameRow');
   var emailInput = document.getElementById('emailInput');
   var submitBtn = document.getElementById('submitBtn');
   var consentCheckbox = document.getElementById('consentCheckbox');
@@ -30,6 +32,7 @@
 
   // --- Show success ---
   function showSuccess() {
+    nameRow.style.display = 'none';
     formRow.style.display = 'none';
     consentRow.style.display = 'none';
     errorMsg.classList.remove('visible');
@@ -38,10 +41,17 @@
 
   // --- Submit handler ---
   async function handleSubmit() {
+    var name = nameInput.value.trim();
     var email = emailInput.value.trim();
     var consent = consentCheckbox.checked;
 
     // Validate
+    if (!name) {
+      nameInput.focus();
+      showError('Enter your first name.');
+      return;
+    }
+
     if (!email) {
       emailInput.focus();
       showError('Enter your email.');
@@ -55,7 +65,7 @@
     }
 
     if (!consent) {
-      showError('Please tick the consent box.');
+      showError('Please agree to continue.');
       return;
     }
 
@@ -67,7 +77,7 @@
       var response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, consent: consent })
+        body: JSON.stringify({ name: name, email: email })
       });
 
       var data = await response.json();
