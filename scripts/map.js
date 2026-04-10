@@ -68,18 +68,13 @@ var PEAK_STYLES = {
 
 // Contour layer styling — centralised for future admin/style_config control
 var CONTOUR_STYLES = {
-    minor: {
-        color: '#c4b990',
-        width: { z13: 0.3, z16: 0.6 },
-        opacity: { z13: 0.25, z15: 0.35, z16: 0.45 },
-        minzoom: 13
-    },
-    major: {
-        color: '#a89b70',
-        width: { z12: 0.5, z14: 0.8, z16: 1.2 },
-        opacity: { z12: 0.3, z14: 0.45, z16: 0.6 },
-        minzoom: 12
-    }
+    majorColor: '#a89b70',
+    minorColor: '#c4b990',
+    majorWidth:   { z12: 0.6, z13: 0.8, z16: 1.2 },
+    minorWidth:   { z12: 0,   z13: 0.3, z16: 0.5 },
+    majorOpacity: { z12: 0.4, z13: 0.5, z16: 0.6 },
+    minorOpacity: { z12: 0,   z13: 0.25, z16: 0.4 },
+    minzoom: 12
 };
 
 var map = null;
@@ -173,57 +168,33 @@ function addDataLayers(config) {
             url: 'mapbox://' + config.contoursTilesetId
         });
 
-        // 20m contours (minor — divisible by 20 but not 100)
+        // Single contour layer — data-driven styling for 100m (major) vs 20m (minor)
         map.addLayer({
-            id: 'rmm-contours-20m',
+            id: 'rmm-contours',
             type: 'line',
             source: 'rmm-contours',
             'source-layer': '10m_Contours-57qbiw',
-            minzoom: CONTOUR_STYLES.minor.minzoom,
-            filter: [
-                'all',
-                ['==', ['%', ['get', 'ELEV'], 20], 0],
-                ['!=', ['%', ['get', 'ELEV'], 100], 0]
-            ],
+            minzoom: CONTOUR_STYLES.minzoom,
+            filter: ['==', ['%', ['get', 'ELEV'], 20], 0],
             layout: { 'line-join': 'round', 'line-cap': 'round' },
             paint: {
-                'line-color': CONTOUR_STYLES.minor.color,
+                'line-color': [
+                    'case',
+                    ['==', ['%', ['get', 'ELEV'], 100], 0],
+                    CONTOUR_STYLES.majorColor,
+                    CONTOUR_STYLES.minorColor
+                ],
                 'line-width': [
                     'interpolate', ['linear'], ['zoom'],
-                    13, CONTOUR_STYLES.minor.width.z13,
-                    16, CONTOUR_STYLES.minor.width.z16
+                    12, ['case', ['==', ['%', ['get', 'ELEV'], 100], 0], CONTOUR_STYLES.majorWidth.z12, CONTOUR_STYLES.minorWidth.z12],
+                    13, ['case', ['==', ['%', ['get', 'ELEV'], 100], 0], CONTOUR_STYLES.majorWidth.z13, CONTOUR_STYLES.minorWidth.z13],
+                    16, ['case', ['==', ['%', ['get', 'ELEV'], 100], 0], CONTOUR_STYLES.majorWidth.z16, CONTOUR_STYLES.minorWidth.z16]
                 ],
                 'line-opacity': [
                     'interpolate', ['linear'], ['zoom'],
-                    13, CONTOUR_STYLES.minor.opacity.z13,
-                    15, CONTOUR_STYLES.minor.opacity.z15,
-                    16, CONTOUR_STYLES.minor.opacity.z16
-                ]
-            }
-        });
-
-        // 100m contours (major — divisible by 100)
-        map.addLayer({
-            id: 'rmm-contours-100m',
-            type: 'line',
-            source: 'rmm-contours',
-            'source-layer': '10m_Contours-57qbiw',
-            minzoom: CONTOUR_STYLES.major.minzoom,
-            filter: ['==', ['%', ['get', 'ELEV'], 100], 0],
-            layout: { 'line-join': 'round', 'line-cap': 'round' },
-            paint: {
-                'line-color': CONTOUR_STYLES.major.color,
-                'line-width': [
-                    'interpolate', ['linear'], ['zoom'],
-                    12, CONTOUR_STYLES.major.width.z12,
-                    14, CONTOUR_STYLES.major.width.z14,
-                    16, CONTOUR_STYLES.major.width.z16
-                ],
-                'line-opacity': [
-                    'interpolate', ['linear'], ['zoom'],
-                    12, CONTOUR_STYLES.major.opacity.z12,
-                    14, CONTOUR_STYLES.major.opacity.z14,
-                    16, CONTOUR_STYLES.major.opacity.z16
+                    12, ['case', ['==', ['%', ['get', 'ELEV'], 100], 0], CONTOUR_STYLES.majorOpacity.z12, CONTOUR_STYLES.minorOpacity.z12],
+                    13, ['case', ['==', ['%', ['get', 'ELEV'], 100], 0], CONTOUR_STYLES.majorOpacity.z13, CONTOUR_STYLES.minorOpacity.z13],
+                    16, ['case', ['==', ['%', ['get', 'ELEV'], 100], 0], CONTOUR_STYLES.majorOpacity.z16, CONTOUR_STYLES.minorOpacity.z16]
                 ]
             }
         });
