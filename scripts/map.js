@@ -16,6 +16,55 @@ const DEFAULTS = {
     terrainExaggeration: 1.5
 };
 
+// Trail layer styling — centralised for future admin/style_config control
+var TRAIL_STYLES = {
+    path: {
+        color: '#3a3428',
+        dasharray: [4, 3],
+        width: { z10: 0.8, z13: 1.5, z16: 3 },
+        opacity: { z10: 0.5, z13: 0.7, z16: 0.9 },
+        minzoom: null
+    },
+    footway: {
+        color: '#8a7e60',
+        dasharray: null,
+        width: { z13: 0.5, z16: 1.5 },
+        opacity: 0.5,
+        minzoom: 13
+    },
+    steps: {
+        color: '#8a7e60',
+        dasharray: [1, 2],
+        width: { z14: 0.5, z17: 1.5 },
+        opacity: 0.4,
+        minzoom: 14
+    },
+    track: {
+        color: '#5a5240',
+        dasharray: null,
+        width: { z10: 0.6, z13: 1.2, z16: 2.5 },
+        opacity: { z10: 0.3, z13: 0.5, z16: 0.7 },
+        minzoom: null
+    }
+};
+
+// Peak layer styling — centralised for future admin/style_config control
+var PEAK_STYLES = {
+    textColor: '#171A14',
+    textHaloColor: '#FFF1D4',
+    textHaloWidth: 2,
+    t1: {
+        minzoom: 8,
+        maxzoom: 13,
+        iconSize: { z8: 0.08, z11: 0.12, z13: 0.15 }
+    },
+    t2: {
+        minzoom: 13,
+        iconSize: { z13: 0.08, z15: 0.12, z18: 0.16 },
+        textSize: { z13: 10, z16: 13 }
+    }
+};
+
 var map = null;
 
 // --- Error state ---
@@ -116,153 +165,149 @@ function addDataLayers(config) {
     // Trail layers — ordered bottom to top
     if (config.trailsTilesetId) {
         // Footways
+        var footwayPaint = {
+            'line-color': TRAIL_STYLES.footway.color,
+            'line-width': [
+                'interpolate', ['linear'], ['zoom'],
+                13, TRAIL_STYLES.footway.width.z13,
+                16, TRAIL_STYLES.footway.width.z16
+            ],
+            'line-opacity': TRAIL_STYLES.footway.opacity
+        };
+        if (TRAIL_STYLES.footway.dasharray) {
+            footwayPaint['line-dasharray'] = TRAIL_STYLES.footway.dasharray;
+        }
         map.addLayer({
             id: 'rmm-trails-footway',
             type: 'line',
             source: 'rmm-trails',
             'source-layer': 'trails-4ee5we',
             filter: ['==', ['get', 'trail_type'], 'footway'],
-            minzoom: 13,
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'round'
-            },
-            paint: {
-                'line-color': '#8B7355',
-                'line-width': [
-                    'interpolate', ['linear'], ['zoom'],
-                    13, 0.5,
-                    16, 1.5
-                ],
-                'line-opacity': 0.5,
-                'line-z-offset': 1
-            }
+            minzoom: TRAIL_STYLES.footway.minzoom,
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: footwayPaint
         });
 
         // Steps
-        map.addLayer({
+        var stepsPaint = {
+            'line-color': TRAIL_STYLES.steps.color,
+            'line-width': [
+                'interpolate', ['linear'], ['zoom'],
+                14, TRAIL_STYLES.steps.width.z14,
+                17, TRAIL_STYLES.steps.width.z17
+            ],
+            'line-opacity': TRAIL_STYLES.steps.opacity
+        };
+        if (TRAIL_STYLES.steps.dasharray) {
+            stepsPaint['line-dasharray'] = TRAIL_STYLES.steps.dasharray;
+        }
+        var stepsLayer = {
             id: 'rmm-trails-steps',
             type: 'line',
             source: 'rmm-trails',
             'source-layer': 'trails-4ee5we',
             filter: ['==', ['get', 'trail_type'], 'steps'],
-            minzoom: 14,
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'butt'
-            },
-            paint: {
-                'line-color': '#8B7355',
-                'line-width': [
-                    'interpolate', ['linear'], ['zoom'],
-                    14, 0.5,
-                    17, 1.5
-                ],
-                'line-opacity': 0.4,
-                'line-dasharray': [1, 2],
-                'line-z-offset': 1
-            }
-        });
+            layout: { 'line-join': 'round', 'line-cap': 'butt' },
+            paint: stepsPaint
+        };
+        if (TRAIL_STYLES.steps.minzoom) { stepsLayer.minzoom = TRAIL_STYLES.steps.minzoom; }
+        map.addLayer(stepsLayer);
 
-        // Tracks (jeep roads)
+        // Tracks (jeep roads — solid)
+        var trackPaint = {
+            'line-color': TRAIL_STYLES.track.color,
+            'line-width': [
+                'interpolate', ['linear'], ['zoom'],
+                10, TRAIL_STYLES.track.width.z10,
+                13, TRAIL_STYLES.track.width.z13,
+                16, TRAIL_STYLES.track.width.z16
+            ],
+            'line-opacity': [
+                'interpolate', ['linear'], ['zoom'],
+                10, TRAIL_STYLES.track.opacity.z10,
+                13, TRAIL_STYLES.track.opacity.z13,
+                16, TRAIL_STYLES.track.opacity.z16
+            ]
+        };
+        if (TRAIL_STYLES.track.dasharray) {
+            trackPaint['line-dasharray'] = TRAIL_STYLES.track.dasharray;
+        }
         map.addLayer({
             id: 'rmm-trails-track',
             type: 'line',
             source: 'rmm-trails',
             'source-layer': 'trails-4ee5we',
             filter: ['==', ['get', 'trail_type'], 'track'],
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'butt'
-            },
-            paint: {
-                'line-color': '#6B6B5E',
-                'line-width': [
-                    'interpolate', ['linear'], ['zoom'],
-                    10, 0.6,
-                    13, 1.2,
-                    16, 2.5
-                ],
-                'line-opacity': [
-                    'interpolate', ['linear'], ['zoom'],
-                    10, 0.3,
-                    13, 0.5,
-                    16, 0.7
-                ],
-                'line-dasharray': [4, 3],
-                'line-z-offset': 1
-            }
+            layout: { 'line-join': 'round', 'line-cap': 'butt' },
+            paint: trackPaint
         });
 
-        // Paths (hiking/running — most prominent)
+        // Paths (hiking/running — dashed, most prominent)
+        var pathPaint = {
+            'line-color': TRAIL_STYLES.path.color,
+            'line-width': [
+                'interpolate', ['linear'], ['zoom'],
+                10, TRAIL_STYLES.path.width.z10,
+                13, TRAIL_STYLES.path.width.z13,
+                16, TRAIL_STYLES.path.width.z16
+            ],
+            'line-opacity': [
+                'interpolate', ['linear'], ['zoom'],
+                10, TRAIL_STYLES.path.opacity.z10,
+                13, TRAIL_STYLES.path.opacity.z13,
+                16, TRAIL_STYLES.path.opacity.z16
+            ]
+        };
+        if (TRAIL_STYLES.path.dasharray) {
+            pathPaint['line-dasharray'] = TRAIL_STYLES.path.dasharray;
+        }
         map.addLayer({
             id: 'rmm-trails-path',
             type: 'line',
             source: 'rmm-trails',
             'source-layer': 'trails-4ee5we',
             filter: ['==', ['get', 'trail_type'], 'path'],
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'round'
-            },
-            paint: {
-                'line-color': '#C8553D',
-                'line-width': [
-                    'interpolate', ['linear'], ['zoom'],
-                    10, 0.8,
-                    13, 1.5,
-                    16, 3
-                ],
-                'line-opacity': [
-                    'interpolate', ['linear'], ['zoom'],
-                    10, 0.5,
-                    13, 0.7,
-                    16, 0.9
-                ],
-                'line-z-offset': 1
-            }
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: pathPaint
         });
     }
 
-    // Peak markers — T1 (zoom 8–13, icon only)
+    // Peak markers — T1 (icon only, lower zooms)
     map.addLayer({
         id: 'rmm-peaks-t1',
         type: 'symbol',
         source: 'rmm-peaks',
-        minzoom: 8,
-        maxzoom: 13,
+        minzoom: PEAK_STYLES.t1.minzoom,
+        maxzoom: PEAK_STYLES.t1.maxzoom,
         layout: {
             'icon-image': 'peak-s1',
             'icon-size': [
                 'interpolate', ['linear'], ['zoom'],
-                8, 0.08,
-                11, 0.12,
-                13, 0.15
+                8,  PEAK_STYLES.t1.iconSize.z8,
+                11, PEAK_STYLES.t1.iconSize.z11,
+                13, PEAK_STYLES.t1.iconSize.z13
             ],
             'icon-allow-overlap': true,
             'icon-ignore-placement': false,
             'symbol-sort-key': [
-                'case',
-                ['has', 'ele'],
-                ['-', ['get', 'ele']],
-                0
+                'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
             ]
         }
     });
 
-    // Peak markers — T2 (zoom 13+, icon + name + elevation)
+    // Peak markers — T2 (icon + name + elevation, higher zooms)
     map.addLayer({
         id: 'rmm-peaks-t2',
         type: 'symbol',
         source: 'rmm-peaks',
-        minzoom: 13,
+        minzoom: PEAK_STYLES.t2.minzoom,
         layout: {
             'icon-image': 'peak-s2',
             'icon-size': [
                 'interpolate', ['linear'], ['zoom'],
-                13, 0.08,
-                15, 0.12,
-                18, 0.16
+                13, PEAK_STYLES.t2.iconSize.z13,
+                15, PEAK_STYLES.t2.iconSize.z15,
+                18, PEAK_STYLES.t2.iconSize.z18
             ],
             'icon-allow-overlap': true,
             'icon-ignore-placement': false,
@@ -275,24 +320,21 @@ function addDataLayers(config) {
             'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
             'text-size': [
                 'interpolate', ['linear'], ['zoom'],
-                13, 10,
-                16, 13
+                13, PEAK_STYLES.t2.textSize.z13,
+                16, PEAK_STYLES.t2.textSize.z16
             ],
             'text-offset': [0, 1.8],
             'text-anchor': 'top',
             'text-max-width': 8,
             'text-optional': true,
             'symbol-sort-key': [
-                'case',
-                ['has', 'ele'],
-                ['-', ['get', 'ele']],
-                0
+                'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
             ]
         },
         paint: {
-            'text-color': '#F5ECD7',
-            'text-halo-color': '#171A14',
-            'text-halo-width': 2
+            'text-color': PEAK_STYLES.textColor,
+            'text-halo-color': PEAK_STYLES.textHaloColor,
+            'text-halo-width': PEAK_STYLES.textHaloWidth
         }
     });
 }
@@ -345,14 +387,14 @@ function initMap(containerId) {
                 });
 
                 // 2. Load peak icons, then add all data layers
-                map.loadImage('/icons/peaks/peak-generic-s1.png', function(errT1, imageT1) {
+                map.loadImage('/public/icons/peaks/peak-generic-s1.png', function(errT1, imageT1) {
                     if (errT1) {
                         console.warn('RMM: T1 icon failed to load');
                     } else {
                         map.addImage('peak-s1', imageT1);
                     }
 
-                    map.loadImage('/icons/peaks/peak-generic-s2.png', function(errT2, imageT2) {
+                    map.loadImage('/public/icons/peaks/peak-generic-s2.png', function(errT2, imageT2) {
                         if (errT2) {
                             console.warn('RMM: T2 icon failed to load');
                         } else {
