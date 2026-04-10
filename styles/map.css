@@ -1,0 +1,79 @@
+/* ============================================
+   RUN MAD MAPS — Map Page Styles
+   ============================================ */
+
+/* --- Full-page map container --- */
+#map-container {
+    position: fixed;
+    top: var(--nav-height, 64px);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+/* --- Panel embed mode --- */
+.map-panel-embed {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- Navigation controls — brand colours --- */
+.mapboxgl-ctrl-group {
+    background: #171A14;
+    border: 1px solid #2a2e24;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.mapboxgl-ctrl-group button {
+    background: #171A14;
+    color: #FFFFFF;
+    border-radius: 0;
+}
+
+.mapboxgl-ctrl-group button:hover {
+    background: #1f2219;
+}
+
+.mapboxgl-ctrl-group button + button {
+    border-top: 1px solid #2a2e24;
+}
+
+.mapboxgl-ctrl-zoom-in .mapboxgl-ctrl-icon,
+.mapboxgl-ctrl-zoom-out .mapboxgl-ctrl-icon,
+.mapboxgl-ctrl-compass .mapboxgl-ctrl-icon {
+    filter: invert(1);
+}
+
+/* --- Error state --- */
+.map-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: #171A14;
+    color: #FFFFFF;
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+    gap: 16px;
+}
+
+.map-error-state p {
+    color: #6b7560;
+    font-size: 14px;
+}
+
+/* --- Mobile --- */
+@media (max-width: 768px) {
+    #map-container {
+        top: var(--nav-height, 64px);
+    }
+
+    .mapboxgl-ctrl-top-right {
+        top: 8px;
+        right: 8px;
+    }
+}
