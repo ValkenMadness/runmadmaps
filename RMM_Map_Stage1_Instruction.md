@@ -158,7 +158,7 @@ map.addSource('mapbox-dem', {
 ```javascript
 map.setTerrain({
   source: 'mapbox-dem',
-  exaggeration: 1.1  // fallback — overridden by style_config if available
+  exaggeration: 1.3  // fallback — overridden by style_config if available
 });
 ```
 
@@ -207,7 +207,7 @@ Expected style_config keys (for future use — apply if present, ignore if absen
 - `map_zoom` — override default zoom
 - `map_pitch` — override default pitch
 - `map_bearing` — override default bearing
-- `terrain_exaggeration` — override 1.1 default
+- `terrain_exaggeration` — override 1.3 default
 
 If style_config loads successfully and contains any of these keys, apply them to the map using `map.easeTo()` for camera values and `map.setTerrain()` for exaggeration. Do not snap — ease smoothly.
 

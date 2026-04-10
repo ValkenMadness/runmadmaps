@@ -13,7 +13,7 @@ const DEFAULTS = {
     zoom: 10,
     pitch: 45,
     bearing: 0,
-    terrainExaggeration: 1.1
+    terrainExaggeration: 1.3
 };
 
 // Trail layer styling — centralised for future admin/style_config control
