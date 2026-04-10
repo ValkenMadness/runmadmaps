@@ -974,6 +974,9 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-top: 1rem;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .component-card {
@@ -1013,6 +1016,9 @@
     gap: 0;
     margin-top: 1rem;
     border: 1px solid rgba(23, 26, 20, 0.15);
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .level-band {
@@ -1056,6 +1062,9 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-top: 1rem;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .grade-card {
@@ -1136,6 +1145,9 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-top: 1rem;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .check-card {
@@ -1174,6 +1186,9 @@
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .verdict-card {
@@ -1263,6 +1278,9 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin-top: 1rem;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .leaderboard-type-card {
