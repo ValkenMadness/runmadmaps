@@ -37,7 +37,6 @@
     height: var(--nav-height);
     background: var(--color-dark);
     z-index: 1000;
-    border-bottom: 2px solid var(--color-accent);
 }
 
 .nav-inner {
@@ -324,5 +323,59 @@
 
     .section {
         padding: 3rem 1rem;
+    }
+}
+
+/* --- Standardised Page Header --- */
+.page-header {
+    background: var(--color-dark);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 2px solid var(--color-accent);
+}
+
+.page-header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.page-header-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    margin: 0 0 0.15rem 0;
+}
+
+.page-header-title {
+    font-family: var(--font-mono);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-white);
+    line-height: 1.3;
+    margin: 0 0 0.15rem 0;
+}
+
+.page-header-subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .page-header-title {
+        font-size: 1.1rem;
+    }
+
+    .page-header-row {
+        flex-direction: column;
     }
 }

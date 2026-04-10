@@ -4,7 +4,7 @@
 
 /* --- MAP PAGE --- */
 .map-container {
-    height: calc(100vh - var(--nav-height, 64px));
+    height: calc(100vh - var(--nav-height, 64px) - 80px);
     display: flex;
     align-items: center;
     justify-content: center;

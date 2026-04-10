@@ -124,6 +124,7 @@
                 '    <a href="/about">About</a>',
                 '    <a href="/shop">Shop</a>',
                 '    <a href="/intelligence">Intelligence</a>',
+                '    <a href="/leaderboards">Leaderboards</a>',
                 '    <a href="/dashboard">Dashboard</a>',
                 '</div>'
             ].join('');

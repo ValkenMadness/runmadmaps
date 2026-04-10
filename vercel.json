@@ -6,7 +6,12 @@
     { "source": "/shop", "destination": "/pages/shop.html" },
     { "source": "/intelligence", "destination": "/pages/intelligence.html" },
     { "source": "/dashboard", "destination": "/pages/dashboard.html" },
-    { "source": "/product", "destination": "/pages/product.html" }
+    { "source": "/product", "destination": "/pages/product.html" },
+    { "source": "/intelligence/fitness", "destination": "/pages/intelligence-fitness.html" },
+    { "source": "/intelligence/routes", "destination": "/pages/intelligence-routes.html" },
+    { "source": "/intelligence/readiness", "destination": "/pages/intelligence-readiness.html" },
+    { "source": "/leaderboards", "destination": "/pages/leaderboards.html" },
+    { "source": "/event", "destination": "/pages/event.html" }
   ],
   "headers": [
     {
