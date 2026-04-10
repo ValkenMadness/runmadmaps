@@ -962,10 +962,6 @@
 /* Alternating section background */
 .section-alt {
     background: rgba(23, 26, 20, 0.04);
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
 }
 
 /* Component grid (RPS / Fitness page) */
@@ -1252,12 +1248,6 @@
         flex-direction: column;
     }
 
-    .section-alt {
-        margin-left: -1rem;
-        margin-right: -1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
 }
 
 @media (max-width: 480px) {
