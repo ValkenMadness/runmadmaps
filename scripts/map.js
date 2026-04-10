@@ -42,7 +42,7 @@ var TRAIL_STYLES = {
     track: {
         color: '#5a5240',
         dasharray: null,
-        width: { z10: 0.2, z13: 0.4, z16: 0.8 },
+        width: { z10: 0.6, z13: 1.2, z16: 2.4 },
         opacity: { z10: 0.3, z13: 0.5, z16: 0.7 },
         minzoom: null
     }
@@ -70,9 +70,9 @@ var PEAK_STYLES = {
 var CONTOUR_STYLES = {
     majorColor: '#a89b70',
     minorColor: '#c4b990',
-    majorWidth:   { z12: 0.6, z13: 0.8, z16: 1.2 },
+    majorWidth:   { z12: 0.3, z13: 0.4, z16: 0.6 },
     minorWidth:   { z12: 0,   z13: 0.3, z16: 0.5 },
-    majorOpacity: { z12: 0.4, z13: 0.5, z16: 0.6 },
+    majorOpacity: { z12: 0.2, z13: 0.25, z16: 0.3 },
     minorOpacity: { z12: 0,   z13: 0.25, z16: 0.4 },
     minzoom: 12
 };
