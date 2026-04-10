@@ -36,147 +36,218 @@
                 </div>
             </div>
 
-            <!-- Dashboard Grid -->
             <div class="dashboard-grid-wrapper">
-                <div class="dashboard-grid">
 
-                    <!-- Map Panel (large) -->
-                    <div class="dash-panel dash-panel-map">
+                <!-- ROW 1: Map + Events side by side -->
+                <div class="dash-row-top">
+
+                    <!-- Map Panel (left, wider) -->
+                    <div class="dash-panel">
                         <div class="dash-panel-header">
                             <span class="dash-panel-title">The Map</span>
-                            <a href="/map" class="dash-panel-expand">Full Screen &#8594;</a>
+                            <a href="/map" class="dash-panel-link">Full Screen &#8594;</a>
                         </div>
-                        <div class="dash-map-placeholder">
-                            <div class="dash-map-placeholder-content">
-                                <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 52L24 20L34 36L40 28L56 52H8Z" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
-                                    <circle cx="44" cy="16" r="4" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/>
-                                </svg>
-                                <p>Map loads here</p>
-                            </div>
+                        <div class="dash-map-area">
+                            <p>Map loads here</p>
                         </div>
                     </div>
 
-                    <!-- RPS Panel -->
-                    <div class="dash-panel dash-panel-rps">
-                        <div class="dash-panel-header">
-                            <span class="dash-panel-title">Runner Performance Score</span>
-                        </div>
-                        <div class="dash-rps-content">
-                            <div class="dash-rps-score">
-                                <span class="dash-rps-number">&#8212;</span>
-                                <span class="dash-rps-label">RPS</span>
-                            </div>
-                            <div class="dash-rps-level">
-                                <span class="dash-rps-level-name">Connect to start</span>
-                            </div>
-                            <div class="dash-rps-bar-track">
-                                <div class="dash-rps-bar-fill" style="width: 0%"></div>
-                            </div>
-                            <div class="dash-rps-bands">
-                                <span>Foundation</span>
-                                <span>Active</span>
-                                <span>Athlete</span>
-                                <span>Competitor</span>
-                                <span>Elite</span>
-                            </div>
-                        </div>
-                        <div class="dash-panel-footer">
-                            <a href="/intelligence" class="dash-panel-link">View Full Breakdown &#8594;</a>
-                        </div>
-                    </div>
-
-                    <!-- Race Readiness Panel -->
-                    <div class="dash-panel dash-panel-readiness">
-                        <div class="dash-panel-header">
-                            <span class="dash-panel-title">Race Readiness</span>
-                        </div>
-                        <div class="dash-readiness-content">
-                            <div class="dash-readiness-target">
-                                <span class="dash-readiness-target-label">Target Route</span>
-                                <span class="dash-readiness-target-value">Not set</span>
-                            </div>
-                            <div class="dash-readiness-checks">
-                                <div class="dash-check inactive">
-                                    <span class="dash-check-name">Distance</span>
-                                    <span class="dash-check-status">&#8212;</span>
-                                </div>
-                                <div class="dash-check inactive">
-                                    <span class="dash-check-name">Volume</span>
-                                    <span class="dash-check-status">&#8212;</span>
-                                </div>
-                                <div class="dash-check inactive">
-                                    <span class="dash-check-name">Performance</span>
-                                    <span class="dash-check-status">&#8212;</span>
-                                </div>
-                                <div class="dash-check inactive">
-                                    <span class="dash-check-name">Recency</span>
-                                    <span class="dash-check-status">&#8212;</span>
-                                </div>
-                                <div class="dash-check inactive">
-                                    <span class="dash-check-name">Elevation</span>
-                                    <span class="dash-check-status">&#8212;</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="dash-panel-footer">
-                            <a href="/intelligence" class="dash-panel-link">Set Target Route &#8594;</a>
-                        </div>
-                    </div>
-
-                    <!-- Events Panel -->
+                    <!-- Events Panel (right, narrower, scrollable) -->
                     <div class="dash-panel dash-panel-events">
                         <div class="dash-panel-header">
                             <span class="dash-panel-title">Events</span>
                         </div>
-                        <div class="dash-events-content">
-                            <div class="dash-event-empty">
-                                <p>No upcoming events</p>
-                                <p class="dash-event-empty-sub">GPS-verified timed events are coming soon. Enter an event and your results will appear here.</p>
-                            </div>
-                        </div>
-                        <div class="dash-panel-footer">
-                            <span class="coming-soon-badge">Events Coming Soon</span>
-                        </div>
-                    </div>
+                        <div class="dash-events-scroll">
 
-                    <!-- Recent Activity Panel -->
-                    <div class="dash-panel dash-panel-activity">
-                        <div class="dash-panel-header">
-                            <span class="dash-panel-title">Recent Activity</span>
-                        </div>
-                        <div class="dash-activity-content">
-                            <div class="dash-activity-empty">
-                                <p>No activities yet</p>
-                                <p class="dash-activity-empty-sub">Connect your Strava or Garmin account to start tracking your Peninsula training.</p>
+                            <div class="dash-event-card">
+                                <div class="dash-event-info">
+                                    <h3 class="dash-event-name">Chase the Dragons Tail</h3>
+                                    <p class="dash-event-grade">Challenge Grade</p>
+                                    <p class="dash-event-desc">A brief 2 liner about the challenge, the trail and a little <a href="/event">read more &#8594;</a></p>
+                                    <div class="dash-event-actions">
+                                        <a href="#" class="dash-btn dash-btn-outline">Sign up &#8594;</a>
+                                        <a href="/leaderboards" class="dash-btn dash-btn-outline">Leaderboard &#8594;</a>
+                                    </div>
+                                </div>
+                                <div class="dash-event-map-preview">
+                                    <p>Map preview of the challenge</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="dash-panel-footer">
-                            <span class="coming-soon-badge">Strava Sync Coming Soon</span>
-                        </div>
-                    </div>
 
-                    <!-- Peaks Progress Panel -->
-                    <div class="dash-panel dash-panel-peaks">
-                        <div class="dash-panel-header">
-                            <span class="dash-panel-title">Peak Hunter</span>
-                        </div>
-                        <div class="dash-peaks-content">
-                            <div class="dash-peaks-counter">
-                                <span class="dash-peaks-count">0</span>
-                                <span class="dash-peaks-total">/ 65</span>
+                            <div class="dash-event-card">
+                                <div class="dash-event-info">
+                                    <h3 class="dash-event-name">The Elephants View</h3>
+                                    <p class="dash-event-grade">Challenge Grade</p>
+                                    <p class="dash-event-desc">A brief 2 liner about the challenge, the trail and a little <a href="/event">read more &#8594;</a></p>
+                                    <div class="dash-event-actions">
+                                        <a href="#" class="dash-btn dash-btn-outline">Sign up &#8594;</a>
+                                        <a href="/leaderboards" class="dash-btn dash-btn-outline">Leaderboard &#8594;</a>
+                                    </div>
+                                </div>
+                                <div class="dash-event-map-preview">
+                                    <p>Map preview of the challenge</p>
+                                </div>
                             </div>
-                            <p class="dash-peaks-label">peaks summited</p>
-                            <div class="dash-peaks-bar-track">
-                                <div class="dash-peaks-bar-fill" style="width: 0%"></div>
+
+                            <div class="dash-event-card">
+                                <div class="dash-event-info">
+                                    <h3 class="dash-event-name">Dancing with the Devil</h3>
+                                    <p class="dash-event-grade">Challenge Grade</p>
+                                    <p class="dash-event-desc">A brief 2 liner about the challenge, the trail and a little <a href="/event">read more &#8594;</a></p>
+                                    <div class="dash-event-actions">
+                                        <a href="#" class="dash-btn dash-btn-outline">Sign up &#8594;</a>
+                                        <a href="/leaderboards" class="dash-btn dash-btn-outline">Leaderboard &#8594;</a>
+                                    </div>
+                                </div>
+                                <div class="dash-event-map-preview">
+                                    <p>Map preview of the challenge</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="dash-panel-footer">
-                            <a href="/map" class="dash-panel-link">Explore Peaks &#8594;</a>
+
                         </div>
                     </div>
 
                 </div>
+
+                <!-- ROW 2: Recent Activity — horizontal scroll -->
+                <div class="dash-activity-section">
+                    <p class="dash-activity-label">Recent Activity</p>
+                    <div class="dash-activity-scroll">
+
+                        <div class="dash-activity-card">
+                            <div class="dash-activity-header">
+                                <h3 class="dash-activity-name">Mastering the 5k - LAP #012</h3>
+                                <p class="dash-activity-grade">Route Grade</p>
+                            </div>
+                            <div class="dash-activity-body">
+                                <div class="dash-activity-stats">
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Distance</span>
+                                        <span class="dash-stat-value">5.25km</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Pace</span>
+                                        <span class="dash-stat-value">6:12</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Elevation</span>
+                                        <span class="dash-stat-value">164m</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Time</span>
+                                        <span class="dash-stat-value">0:29:35</span>
+                                    </div>
+                                </div>
+                                <div class="dash-activity-map-preview">
+                                    <p>Map preview of the challenge</p>
+                                </div>
+                            </div>
+                            <a href="#" class="dash-activity-link">Learn More &#8594;</a>
+                        </div>
+
+                        <div class="dash-activity-card">
+                            <div class="dash-activity-header">
+                                <h3 class="dash-activity-name">Ou Wa Pad Sprint</h3>
+                                <p class="dash-activity-grade">Route Grade</p>
+                            </div>
+                            <div class="dash-activity-body">
+                                <div class="dash-activity-stats">
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Distance</span>
+                                        <span class="dash-stat-value">9.48km</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Pace</span>
+                                        <span class="dash-stat-value">7:12</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Elevation</span>
+                                        <span class="dash-stat-value">325m</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Time</span>
+                                        <span class="dash-stat-value">1:31:35</span>
+                                    </div>
+                                </div>
+                                <div class="dash-activity-map-preview">
+                                    <p>Map preview of the challenge</p>
+                                </div>
+                            </div>
+                            <a href="#" class="dash-activity-link">Learn More &#8594;</a>
+                        </div>
+
+                        <div class="dash-activity-card">
+                            <div class="dash-activity-header">
+                                <h3 class="dash-activity-name">Mastering the 5k - LAP #011</h3>
+                                <p class="dash-activity-grade">Route Grade</p>
+                            </div>
+                            <div class="dash-activity-body">
+                                <div class="dash-activity-stats">
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Distance</span>
+                                        <span class="dash-stat-value">5.25km</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Pace</span>
+                                        <span class="dash-stat-value">6:12</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Elevation</span>
+                                        <span class="dash-stat-value">164m</span>
+                                    </div>
+                                    <div class="dash-stat">
+                                        <span class="dash-stat-label">Time</span>
+                                        <span class="dash-stat-value">0:29:35</span>
+                                    </div>
+                                </div>
+                                <div class="dash-activity-map-preview">
+                                    <p>Map preview of the challenge</p>
+                                </div>
+                            </div>
+                            <a href="#" class="dash-activity-link">Learn More &#8594;</a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ROW 3: RPS + Race Readiness + Lifetime Summary -->
+                <div class="dash-row-three">
+                    <div class="dash-panel dash-panel-tall">
+                        <div class="dash-panel-header">
+                            <span class="dash-panel-title">Runner Performance Score</span>
+                        </div>
+                        <div class="dash-panel-body"></div>
+                    </div>
+                    <div class="dash-panel dash-panel-tall">
+                        <div class="dash-panel-header">
+                            <span class="dash-panel-title">Race Readiness</span>
+                        </div>
+                        <div class="dash-panel-body"></div>
+                    </div>
+                    <div class="dash-panel dash-panel-tall">
+                        <div class="dash-panel-header">
+                            <span class="dash-panel-title">Lifetime Summary</span>
+                        </div>
+                        <div class="dash-panel-body"></div>
+                    </div>
+                </div>
+
+                <!-- ROW 4: Peak Hunter + Cave Diver -->
+                <div class="dash-row-two">
+                    <div class="dash-panel dash-panel-tall">
+                        <div class="dash-panel-header">
+                            <span class="dash-panel-title">Peak Hunter</span>
+                        </div>
+                        <div class="dash-panel-body"></div>
+                    </div>
+                    <div class="dash-panel dash-panel-tall">
+                        <div class="dash-panel-header">
+                            <span class="dash-panel-title">Cave Diver</span>
+                        </div>
+                        <div class="dash-panel-body"></div>
+                    </div>
+                </div>
+
             </div>
 
         </div>

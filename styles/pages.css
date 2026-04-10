@@ -391,356 +391,6 @@
 
 
 /* ============================================
-   DASHBOARD PAGE
-   ============================================ */
-
-.dashboard-header {
-    background: var(--color-dark);
-    color: var(--color-white);
-}
-
-.dashboard-header .section-label {
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.dashboard-header .section-heading {
-    color: var(--color-white);
-}
-
-.dashboard-welcome {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-}
-
-.dashboard-subtitle {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.dashboard-auth-badge {
-    flex-shrink: 0;
-}
-
-.dashboard-grid-wrapper {
-    padding: 1.5rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    gap: 1rem;
-}
-
-/* Map panel spans full width */
-.dash-panel-map {
-    grid-column: 1 / -1;
-}
-
-/* Panel base */
-.dash-panel {
-    border: 1px solid rgba(23, 26, 20, 0.12);
-    background: rgba(255, 255, 255, 0.5);
-    display: flex;
-    flex-direction: column;
-}
-
-.dash-panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid rgba(23, 26, 20, 0.08);
-}
-
-.dash-panel-title {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-dark);
-}
-
-.dash-panel-expand {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.dash-panel-expand:hover {
-    color: var(--color-accent);
-}
-
-.dash-panel-footer {
-    padding: 0.75rem 1.25rem;
-    border-top: 1px solid rgba(23, 26, 20, 0.08);
-    margin-top: auto;
-}
-
-.dash-panel-link {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.dash-panel-link:hover {
-    color: var(--color-accent);
-}
-
-/* Map placeholder in dashboard */
-.dash-map-placeholder {
-    height: 320px;
-    background: #171A14;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dash-map-placeholder-content {
-    text-align: center;
-}
-
-.dash-map-placeholder-content p {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.3);
-    margin-top: 0.75rem;
-}
-
-/* RPS Panel */
-.dash-rps-content {
-    padding: 1.5rem 1.25rem;
-    text-align: center;
-}
-
-.dash-rps-score {
-    margin-bottom: 0.25rem;
-}
-
-.dash-rps-number {
-    font-family: var(--font-mono);
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--color-dark);
-    line-height: 1;
-}
-
-.dash-rps-label {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    color: var(--color-muted);
-    letter-spacing: 0.15em;
-    margin-left: 0.35rem;
-}
-
-.dash-rps-level {
-    margin-bottom: 1rem;
-}
-
-.dash-rps-level-name {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-}
-
-.dash-rps-bar-track {
-    height: 4px;
-    background: rgba(23, 26, 20, 0.1);
-    margin-bottom: 0.5rem;
-    overflow: hidden;
-}
-
-.dash-rps-bar-fill {
-    height: 100%;
-    background: var(--color-dark);
-    transition: width 0.3s ease;
-}
-
-.dash-rps-bands {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
-    color: var(--color-muted);
-    letter-spacing: 0.02em;
-}
-
-/* Race Readiness Panel */
-.dash-readiness-content {
-    padding: 1.25rem;
-}
-
-.dash-readiness-target {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.75rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(23, 26, 20, 0.08);
-}
-
-.dash-readiness-target-label {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--color-muted);
-}
-
-.dash-readiness-target-value {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--color-dark);
-}
-
-.dash-readiness-checks {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.dash-check {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-}
-
-.dash-check.inactive .dash-check-name {
-    color: var(--color-muted);
-}
-
-.dash-check.inactive .dash-check-status {
-    color: rgba(23, 26, 20, 0.2);
-}
-
-.dash-check-name {
-    color: var(--color-dark);
-}
-
-.dash-check-status {
-    font-weight: 700;
-}
-
-/* Events Panel */
-.dash-events-content {
-    padding: 1.25rem;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dash-event-empty,
-.dash-activity-empty {
-    text-align: center;
-}
-
-.dash-event-empty p:first-child,
-.dash-activity-empty p:first-child {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--color-dark);
-    margin-bottom: 0.5rem;
-}
-
-.dash-event-empty-sub,
-.dash-activity-empty-sub {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    line-height: 1.5;
-    max-width: 280px;
-    margin: 0 auto;
-}
-
-/* Activity Panel */
-.dash-activity-content {
-    padding: 1.25rem;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Peaks Panel */
-.dash-peaks-content {
-    padding: 1.5rem 1.25rem;
-    text-align: center;
-}
-
-.dash-peaks-counter {
-    margin-bottom: 0.25rem;
-}
-
-.dash-peaks-count {
-    font-family: var(--font-mono);
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--color-dark);
-}
-
-.dash-peaks-total {
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    color: var(--color-muted);
-    margin-left: 0.15rem;
-}
-
-.dash-peaks-label {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--color-muted);
-    letter-spacing: 0.1em;
-    margin-bottom: 1rem;
-}
-
-.dash-peaks-bar-track {
-    height: 4px;
-    background: rgba(23, 26, 20, 0.1);
-    overflow: hidden;
-}
-
-.dash-peaks-bar-fill {
-    height: 100%;
-    background: var(--color-accent);
-    transition: width 0.3s ease;
-}
-
-/* Dashboard responsive */
-@media (max-width: 768px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .dashboard-welcome {
-        flex-direction: column;
-    }
-
-    .dash-map-placeholder {
-        height: 240px;
-    }
-
-    .dash-rps-bands {
-        font-size: 0.45rem;
-    }
-}
-
-
-/* ============================================
    PRODUCT PAGE
    ============================================ */
 
@@ -968,5 +618,384 @@
     .product-thumb {
         width: 48px;
         height: 48px;
+    }
+}
+
+
+/* ============================================
+   DASHBOARD — REBUILT FROM WIREFRAME
+   ============================================ */
+
+.dashboard-grid-wrapper {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- Shared Panel Styles --- */
+.dash-panel {
+    border: 1px solid rgba(23, 26, 20, 0.12);
+    background: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(23, 26, 20, 0.08);
+}
+
+.dash-panel-title {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+}
+
+.dash-panel-link {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.dash-panel-link:hover {
+    color: var(--color-accent);
+}
+
+.dash-panel-body {
+    flex: 1;
+}
+
+.dash-panel-tall {
+    min-height: 350px;
+}
+
+/* --- ROW 1: Map + Events --- */
+.dash-row-top {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.dash-map-area {
+    height: 400px;
+    background: var(--color-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dash-map-area p {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.25);
+}
+
+/* Events panel — internal scroll */
+.dash-panel-events {
+    position: relative;
+}
+
+.dash-events-scroll {
+    flex: 1;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.dash-events-scroll::-webkit-scrollbar {
+    width: 3px;
+}
+
+.dash-events-scroll::-webkit-scrollbar-track {
+    background: rgba(23, 26, 20, 0.03);
+}
+
+.dash-events-scroll::-webkit-scrollbar-thumb {
+    background: rgba(23, 26, 20, 0.12);
+}
+
+/* Scroll indicator — thin accent line at bottom */
+.dash-panel-events::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-accent);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Event card */
+.dash-event-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(23, 26, 20, 0.12);
+    background: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+}
+
+.dash-event-info {
+    flex: 1;
+}
+
+.dash-event-name {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin: 0 0 0.2rem 0;
+}
+
+.dash-event-grade {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    margin: 0 0 0.5rem 0;
+}
+
+.dash-event-desc {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+    margin: 0 0 0.75rem 0;
+}
+
+.dash-event-desc a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.dash-event-desc a:hover {
+    text-decoration: underline;
+}
+
+.dash-event-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dash-btn {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    padding: 0.35rem 0.75rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-block;
+}
+
+.dash-btn-outline {
+    border: 1px solid rgba(23, 26, 20, 0.25);
+    color: var(--color-dark);
+    background: transparent;
+}
+
+.dash-btn-outline:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+.dash-event-map-preview {
+    width: 120px;
+    min-height: 100px;
+    background: rgba(23, 26, 20, 0.06);
+    border: 1px solid rgba(23, 26, 20, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dash-event-map-preview p {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--color-muted);
+    text-align: center;
+    padding: 0.5rem;
+}
+
+/* --- ROW 2: Recent Activity — horizontal scroll --- */
+.dash-activity-section {
+    margin-bottom: 1rem;
+}
+
+.dash-activity-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-dark);
+    padding: 0.75rem 0;
+    margin: 0;
+}
+
+.dash-activity-scroll {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.dash-activity-scroll::-webkit-scrollbar {
+    height: 3px;
+}
+
+.dash-activity-scroll::-webkit-scrollbar-track {
+    background: rgba(23, 26, 20, 0.05);
+}
+
+.dash-activity-scroll::-webkit-scrollbar-thumb {
+    background: rgba(23, 26, 20, 0.15);
+}
+
+.dash-activity-card {
+    min-width: 320px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    border: 1px solid rgba(23, 26, 20, 0.12);
+    background: rgba(255, 255, 255, 0.5);
+    padding: 1rem;
+}
+
+.dash-activity-header {
+    margin-bottom: 0.75rem;
+}
+
+.dash-activity-name {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin: 0 0 0.15rem 0;
+}
+
+.dash-activity-grade {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--color-muted);
+    margin: 0;
+}
+
+.dash-activity-body {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.dash-activity-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.dash-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--color-muted);
+    display: block;
+    margin-bottom: 0.1rem;
+}
+
+.dash-stat-value {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    display: block;
+}
+
+.dash-activity-map-preview {
+    width: 100px;
+    background: rgba(23, 26, 20, 0.06);
+    border: 1px solid rgba(23, 26, 20, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.dash-activity-map-preview p {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    color: var(--color-muted);
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.dash-activity-link {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+.dash-activity-link:hover {
+    text-decoration: underline;
+}
+
+/* --- ROW 3: Three equal panels --- */
+.dash-row-three {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* --- ROW 4: Two equal panels --- */
+.dash-row-two {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* --- Dashboard Responsive --- */
+@media (max-width: 768px) {
+    .dash-row-top {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-map-area {
+        height: 280px;
+    }
+
+    .dash-events-scroll {
+        max-height: 300px;
+    }
+
+    .dash-row-three {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-row-two {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-activity-card {
+        min-width: 280px;
+    }
+
+    .dash-event-map-preview {
+        display: none;
     }
 }
