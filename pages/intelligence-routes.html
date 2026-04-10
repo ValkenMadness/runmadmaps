@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Analyzer — Run Mad Maps</title>
+    <meta name="description" content="Objective route grading from GPS data. Difficulty Class, Terrain Difficulty Score, Effort Descriptor.">
+    <link rel="icon" type="image/png" href="/public/images/favicon.png">
+    <meta property="og:title" content="Route Analyzer — Run Mad Maps">
+    <meta property="og:description" content="Objective route grading from GPS data. Difficulty Class, Terrain Difficulty Score, Effort Descriptor.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://runmadmaps.com/intelligence/routes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/components.css">
+    <link rel="stylesheet" href="/styles/pages.css">
+</head>
+<body>
+    <div class="page-shell">
+        <div class="page-content">
+
+            <div class="page-header">
+                <div class="page-header-inner">
+                    <p class="page-header-label">INTELLIGENCE / ROUTES</p>
+                    <h1 class="page-header-title">The Route Analyzer</h1>
+                    <p class="page-header-subtitle">Pure GPS grading — no opinions, no guesswork</p>
+                </div>
+            </div>
+
+            <!-- Section 1: What It Is -->
+            <div class="section">
+                <p class="section-label">What It Is</p>
+                <h2 class="section-heading">Upload a GPX file. Get a grade.</h2>
+                <div class="section-body">
+                    <p>Every route receives a Difficulty Class (A through F), a Terrain Difficulty Score (1–10), and an Effort Descriptor. The grade comes from GPS data alone — no manual tags, no subjective input, no curator opinions. Same file, same grade. Always.</p>
+                    <p>A is hardest. Intentional inversion — A-grade athletes, A-races, A-game. The grade describes the route, not the athlete.</p>
+                </div>
+            </div>
+
+            <!-- Section 2: The Six Grades -->
+            <div class="section section-alt">
+                <p class="section-label">The Grade System</p>
+                <h2 class="section-heading">Six grades. A through F.</h2>
+                <div class="grade-grid">
+                    <div class="grade-card grade-a">
+                        <span class="grade-letter">A</span>
+                        <span class="grade-name">Extreme</span>
+                        <p>Gorge-class. Relentless sustained brutality.</p>
+                    </div>
+                    <div class="grade-card grade-b">
+                        <span class="grade-letter">B</span>
+                        <span class="grade-name">Performance</span>
+                        <p>Serious mountain terrain. Tests strong athletes.</p>
+                    </div>
+                    <div class="grade-card grade-c">
+                        <span class="grade-letter">C</span>
+                        <span class="grade-name">Mountain</span>
+                        <p>Real climbing. Demands fitness and preparation.</p>
+                    </div>
+                    <div class="grade-card grade-d">
+                        <span class="grade-letter">D</span>
+                        <span class="grade-name">Conditioning</span>
+                        <p>Moderate hills. Honest sustained effort.</p>
+                    </div>
+                    <div class="grade-card grade-e">
+                        <span class="grade-letter">E</span>
+                        <span class="grade-name">Accessible</span>
+                        <p>Rolling to flat. Buildable. Entry point.</p>
+                    </div>
+                    <div class="grade-card grade-f">
+                        <span class="grade-letter">F</span>
+                        <span class="grade-name">Recovery</span>
+                        <p>Flat, short. Active recovery.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Validated Routes -->
+            <div class="section">
+                <p class="section-label">Proven on the Peninsula</p>
+                <h2 class="section-heading">Seven validated routes</h2>
+                <div class="routes-table-container">
+                    <table class="routes-table">
+                        <thead>
+                            <tr>
+                                <th>Route</th>
+                                <th>Distance</th>
+                                <th>Gain</th>
+                                <th>ED (m/km)</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Promenade Stretch</td>
+                                <td>2.65 km</td>
+                                <td>6m</td>
+                                <td>2.4</td>
+                                <td>F · 1/10</td>
+                            </tr>
+                            <tr>
+                                <td>Silvermine</td>
+                                <td>3.60 km</td>
+                                <td>155m</td>
+                                <td>43.1</td>
+                                <td>D · 3/10</td>
+                            </tr>
+                            <tr>
+                                <td>Ou Wapad</td>
+                                <td>4.78 km</td>
+                                <td>310m</td>
+                                <td>64.8</td>
+                                <td>C · 4/10</td>
+                            </tr>
+                            <tr>
+                                <td>Elsie's Peak</td>
+                                <td>1.65 km</td>
+                                <td>199m</td>
+                                <td>121.0</td>
+                                <td class="grade-a-text">A · 6/10</td>
+                            </tr>
+                            <tr>
+                                <td>Lion's Head</td>
+                                <td>2.12 km</td>
+                                <td>278m</td>
+                                <td>131.1</td>
+                                <td class="grade-a-text">A · 6/10</td>
+                            </tr>
+                            <tr>
+                                <td>Skeleton Gorge</td>
+                                <td>2.21 km</td>
+                                <td>620m</td>
+                                <td>281.0</td>
+                                <td class="grade-a-text">A · 10/10</td>
+                            </tr>
+                            <tr>
+                                <td>Platteklip Gorge</td>
+                                <td>4.20 km</td>
+                                <td>888m</td>
+                                <td>211.7</td>
+                                <td class="grade-a-text">A · 10/10</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section 4: CTA -->
+            <div class="section section-cta">
+                <h2 class="section-heading">Upload a GPX and see the grade</h2>
+                <p class="section-body">Drop any GPX file and get an objective, GPS-derived grade in seconds.</p>
+                <span class="coming-soon-badge">Coming Soon</span>
+            </div>
+
+        </div>
+    </div>
+    <script src="/scripts/components.js"></script>
+</body>
+</html>
