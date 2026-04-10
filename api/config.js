@@ -18,5 +18,9 @@ module.exports = function handler(req, res) {
     }
 
     res.setHeader('Content-Type', 'application/json');
-    res.status(200).json({ token: token, styleUrl: styleUrl });
+    res.status(200).json({
+        token: token,
+        styleUrl: styleUrl,
+        trailsTilesetId: process.env.TRAILS_TILESET_ID || ''
+    });
 };
