@@ -1,0 +1,1135 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.389142,
+          -33.9350393
+        ]
+      },
+      "properties": {
+        "name": "Lion's Head",
+        "ele": 669.0,
+        "name_en": "Lion's Head",
+        "name_af": "Leeukop",
+        "osm_id": "48944401"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3378348,
+          -34.0594915
+        ]
+      },
+      "properties": {
+        "name": "The Sentinel",
+        "ele": 330.8,
+        "name_en": "The Sentinel",
+        "name_af": "Hangberg",
+        "osm_id": "280511168"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4255552,
+          -33.966832
+        ]
+      },
+      "properties": {
+        "name": "Table Mountain (Maclear's beacon)",
+        "ele": 1086.0,
+        "name_en": "Table Mountain (Maclear's beacon)",
+        "osm_id": "282699448",
+        "prominence": 1057.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4039138,
+          -33.9170033
+        ]
+      },
+      "properties": {
+        "name": "Signal Hill",
+        "ele": 350.0,
+        "name_en": "Signal Hill",
+        "name_af": "Seinheuwel",
+        "osm_id": "287092475"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.343467,
+          -34.0167872
+        ]
+      },
+      "properties": {
+        "name": "Little Lion's Head",
+        "ele": 436.6,
+        "name_en": "Little Lion's Head",
+        "name_af": "Klein Leeukop",
+        "alt_name": "Mount Rhodes",
+        "osm_id": "305142942",
+        "prominence": 287.0
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4040151,
+          -34.0070906
+        ]
+      },
+      "properties": {
+        "name": "Eagles' Nest",
+        "ele": 421.2,
+        "osm_id": "333587352"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4271265,
+          -33.9728708
+        ]
+      },
+      "properties": {
+        "name": "Fernwood Peak",
+        "ele": 1003.1,
+        "osm_id": "345446926"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4158782,
+          -33.9738344
+        ]
+      },
+      "properties": {
+        "name": "Junction Peak",
+        "ele": 919.0,
+        "osm_id": "345446949"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4105188,
+          -33.9821326
+        ]
+      },
+      "properties": {
+        "name": "Reserve Peak",
+        "ele": 844.0,
+        "osm_id": "345447010"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4357795,
+          -34.202499
+        ]
+      },
+      "properties": {
+        "name": "North Peak",
+        "ele": 486.0,
+        "osm_id": "345447028"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3854789,
+          -34.0541746
+        ]
+      },
+      "properties": {
+        "name": "Constantiaberg",
+        "ele": 927.7,
+        "osm_id": "388608972"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3355793,
+          -34.04708639999998
+        ]
+      },
+      "properties": {
+        "name": "Kapteinspiek",
+        "ele": 414.0,
+        "osm_id": "454664492"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3243316,
+          -34.0400229
+        ]
+      },
+      "properties": {
+        "name": "Karbonkelberg",
+        "ele": 653.4,
+        "osm_id": "454669946"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3276095,
+          -34.0332623
+        ]
+      },
+      "properties": {
+        "name": "Suther Peak",
+        "ele": 614.7,
+        "osm_id": "454669949"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4506919,
+          -34.2158871
+        ]
+      },
+      "properties": {
+        "name": "Swartkop",
+        "ele": 678.0,
+        "osm_id": "740006058"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3596131,
+          -34.0884325
+        ]
+      },
+      "properties": {
+        "name": "Chapman's Peak",
+        "ele": 592.5,
+        "name_en": "Chapman's Peak",
+        "name_af": "Chapman'spiek",
+        "osm_id": "767322357"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3626292,
+          -34.0842452
+        ]
+      },
+      "properties": {
+        "name": "Lower Chapman's Peak",
+        "ele": 547.0,
+        "name_en": "Lower Chapman's Peak",
+        "name_af": "Bo Chapman'spiek",
+        "osm_id": "767322363"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3753946,
+          -33.9922786
+        ]
+      },
+      "properties": {
+        "name": "Grootkop",
+        "ele": 857.0,
+        "osm_id": "848612165"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3610292,
+          -34.0010117
+        ]
+      },
+      "properties": {
+        "name": "Judas Peak",
+        "ele": 758.0,
+        "osm_id": "848612728"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4591111,
+          -34.1003429
+        ]
+      },
+      "properties": {
+        "name": "Muizenberg Peak",
+        "ele": 507.2,
+        "osm_id": "866446127"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3969818,
+          -34.0178465
+        ]
+      },
+      "properties": {
+        "name": "Unnamed Peak",
+        "ele": 433.0,
+        "osm_id": "883545067"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3714039,
+          -34.032354
+        ]
+      },
+      "properties": {
+        "name": "Skoorsteenberg",
+        "ele": 549.7,
+        "alt_name": "Skoorsteenkop",
+        "osm_id": "889449592"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3811595,
+          -34.060237
+        ]
+      },
+      "properties": {
+        "name": "Unnamed Peak",
+        "ele": 625.0,
+        "osm_id": "891809182"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4135323,
+          -34.0961094
+        ]
+      },
+      "properties": {
+        "name": "Bokkop",
+        "ele": 405.0,
+        "osm_id": "899608663"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3967332,
+          -34.0952486
+        ]
+      },
+      "properties": {
+        "name": "Spitskop",
+        "ele": 447.0,
+        "osm_id": "899627743"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4470664,
+          -34.0938012
+        ]
+      },
+      "properties": {
+        "name": "Lower Steenberg",
+        "ele": 504.0,
+        "name_en": "Lower Steenberg",
+        "name_af": "Laer Steenbergpiek",
+        "osm_id": "904003648"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4289817,
+          -34.1104575
+        ]
+      },
+      "properties": {
+        "name": "Klein-Tuinkop",
+        "ele": 492.0,
+        "osm_id": "904003651"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4263934,
+          -34.0928108
+        ]
+      },
+      "properties": {
+        "name": "Wolfkop",
+        "ele": 446.0,
+        "osm_id": "904003653"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.436188,
+          -34.09325819999999
+        ]
+      },
+      "properties": {
+        "name": "Higher Steenberg",
+        "ele": 537.0,
+        "name_en": "High Steenberg",
+        "name_af": "Ho\u00ebr Steenbergpiek",
+        "osm_id": "904003667"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4395386,
+          -34.1123536
+        ]
+      },
+      "properties": {
+        "name": "Kalk Bay Peak",
+        "ele": 516.0,
+        "osm_id": "912499022"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4398572,
+          -34.1151618
+        ]
+      },
+      "properties": {
+        "name": "Ridge Peak",
+        "ele": 507.2,
+        "osm_id": "912499203"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4405814,
+          -34.2064896
+        ]
+      },
+      "properties": {
+        "name": "Simonsberg",
+        "ele": 564.0,
+        "osm_id": "939018110"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3801651,
+          -34.0727282
+        ]
+      },
+      "properties": {
+        "name": "Noordhoek Peak",
+        "ele": 764.0,
+        "name_en": "Noordhoek Peak",
+        "name_af": "Noordhoekpiek",
+        "osm_id": "1261353893"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4403929,
+          -33.9546074
+        ]
+      },
+      "properties": {
+        "name": "Devil's Peak",
+        "ele": 1000.5,
+        "name_en": "Devil's Peak",
+        "name_af": "Duiwelspiek",
+        "osm_id": "2718061707"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4031348,
+          -33.9672301
+        ]
+      },
+      "properties": {
+        "name": "Blinkwater Peak",
+        "ele": 989.0,
+        "osm_id": "4173212002"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4126831,
+          -33.980007
+        ]
+      },
+      "properties": {
+        "name": "Cleft Peak",
+        "ele": 833.0,
+        "osm_id": "4173212003"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4066307,
+          -33.9619426
+        ]
+      },
+      "properties": {
+        "name": "Fountain Peak",
+        "ele": 1051.0,
+        "osm_id": "4173212004"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4116156,
+          -33.971032
+        ]
+      },
+      "properties": {
+        "name": "St. Michael Peak",
+        "ele": 917.0,
+        "osm_id": "4173212005"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4405975,
+          -33.95233240000001
+        ]
+      },
+      "properties": {
+        "name": "Minor Peak",
+        "ele": 856.0,
+        "osm_id": "4254111486"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4402149,
+          -34.127797499999986
+        ]
+      },
+      "properties": {
+        "name": "Trappies Kop",
+        "ele": 240.0,
+        "osm_id": "4756650026"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4356101,
+          -34.150136299999986
+        ]
+      },
+      "properties": {
+        "name": "Elsies Peak",
+        "ele": 302.9,
+        "osm_id": "4756650027"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4240134,
+          -34.1130541
+        ]
+      },
+      "properties": {
+        "name": "Blokhuiskop",
+        "ele": 417.0,
+        "osm_id": "4792011323"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4581745,
+          -34.108323
+        ]
+      },
+      "properties": {
+        "name": "St. James Peak",
+        "ele": 422.3,
+        "osm_id": "4792011330"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4328203,
+          -34.103404
+        ]
+      },
+      "properties": {
+        "name": "Maiden Peak",
+        "ele": 372.0,
+        "osm_id": "4792011334"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4298008,
+          -33.9490891
+        ]
+      },
+      "properties": {
+        "name": "Oppelskop",
+        "osm_id": "5646048826"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3840172,
+          -34.2184797
+        ]
+      },
+      "properties": {
+        "name": "Bonteberg",
+        "ele": 232.5,
+        "osm_id": "6248493002"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4723429,
+          -34.2782982
+        ]
+      },
+      "properties": {
+        "name": "Judas Peak",
+        "ele": 319.0,
+        "osm_id": "6248493022"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4631445,
+          -34.2939478
+        ]
+      },
+      "properties": {
+        "name": "Paulsberg",
+        "ele": 366.8,
+        "osm_id": "6248494982"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4640402,
+          -34.3271904
+        ]
+      },
+      "properties": {
+        "name": "Matrooskop",
+        "ele": 107.7,
+        "osm_id": "6248495761"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4748889,
+          -34.3456719
+        ]
+      },
+      "properties": {
+        "name": "Vasco Dagamapiek",
+        "ele": 266.0,
+        "osm_id": "6248500753"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4512873,
+          -34.2659119
+        ]
+      },
+      "properties": {
+        "name": "Rooihoogte",
+        "ele": 274.9,
+        "osm_id": "6248501543"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4189888,
+          -34.1889599
+        ]
+      },
+      "properties": {
+        "name": "Red Hill",
+        "ele": 266.8,
+        "osm_id": "6248502094"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4114826,
+          -34.1389382
+        ]
+      },
+      "properties": {
+        "name": "Brakkloofrant",
+        "ele": 305.4,
+        "osm_id": "6248503084"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3754818,
+          -34.144104
+        ]
+      },
+      "properties": {
+        "name": "Rooikrans",
+        "ele": 364.3,
+        "osm_id": "6248506435"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3581965,
+          -34.1730957
+        ]
+      },
+      "properties": {
+        "name": "Platkop",
+        "ele": 371.1,
+        "osm_id": "6248507657"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3685753,
+          -34.1752809
+        ]
+      },
+      "properties": {
+        "name": "Vlooiberg",
+        "ele": 377.0,
+        "osm_id": "6248508498"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3714386,
+          -34.18913579999999
+        ]
+      },
+      "properties": {
+        "name": "Platberg",
+        "ele": 307.5,
+        "osm_id": "6248508944"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3909866,
+          -34.1846275
+        ]
+      },
+      "properties": {
+        "name": "Grootkop",
+        "ele": 390.0,
+        "osm_id": "6248509206"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4086396,
+          -33.9945406
+        ]
+      },
+      "properties": {
+        "name": "Klassenkop",
+        "ele": 742.0,
+        "osm_id": "6248624601"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4286809,
+          -33.966326
+        ]
+      },
+      "properties": {
+        "name": "Ascension Buttress",
+        "osm_id": "7222173953"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.40041,
+          -34.2011582
+        ]
+      },
+      "properties": {
+        "name": "Arendskop",
+        "ele": 189.0,
+        "osm_id": "7222292050"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4174522,
+          -33.9713533
+        ]
+      },
+      "properties": {
+        "name": "Waaikoppie",
+        "ele": 933.0,
+        "osm_id": "7244228930"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4014533,
+          -33.965330899999984
+        ]
+      },
+      "properties": {
+        "name": "Blinkwater Needle",
+        "osm_id": "7244228936"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4076786,
+          -34.118351
+        ]
+      },
+      "properties": {
+        "name": "Skildersgatkop",
+        "ele": 127.0,
+        "name_af": "Skildersgatkop",
+        "osm_id": "7244509526"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3731117,
+          -34.1794464
+        ]
+      },
+      "properties": {
+        "name": "Varingkop",
+        "osm_id": "7245405182"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3985312,
+          -34.0275049
+        ]
+      },
+      "properties": {
+        "name": "Vlakkenberg",
+        "ele": 579.0,
+        "osm_id": "7282376840"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3654497,
+          -33.997489
+        ]
+      },
+      "properties": {
+        "name": "Separation Buttress",
+        "ele": 757.0,
+        "osm_id": "7282376841"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4142789,
+          -34.15894
+        ]
+      },
+      "properties": {
+        "name": "Commonly known as ERF #1",
+        "osm_id": "7667163632"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3878616,
+          -34.1087728
+        ]
+      },
+      "properties": {
+        "name": "Dassenberg",
+        "ele": 163.0,
+        "osm_id": "9517406238"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4025972,
+          -34.0816751
+        ]
+      },
+      "properties": {
+        "name": "Baboon Hill",
+        "ele": 500.0,
+        "osm_id": "9610854365"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3960496,
+          -34.0908558
+        ]
+      },
+      "properties": {
+        "name": "Noordhoek Lower",
+        "ele": 493.5,
+        "osm_id": "9688406341"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3437398,
+          -34.1299638
+        ]
+      },
+      "properties": {
+        "name": "Klein Slangkop",
+        "osm_id": "12452418872"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3930511,
+          -34.0822424
+        ]
+      },
+      "properties": {
+        "name": "Vanguard Peak",
+        "ele": 557.0,
+        "osm_id": "13477393162"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.3939528,
+          -34.0845426
+        ]
+      },
+      "properties": {
+        "name": "Falcon Peak",
+        "ele": 527.0,
+        "osm_id": "13477393163"
+      }
+    }
+  ]
+}
