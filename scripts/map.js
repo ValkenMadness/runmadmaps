@@ -56,12 +56,29 @@ var PEAK_STYLES = {
     t1: {
         minzoom: 8,
         maxzoom: 13,
-        iconSize: { z8: 0.08, z11: 0.12, z13: 0.15 }
+        iconSize: { z8: 0.04, z11: 0.06, z13: 0.075 }
     },
     t2: {
         minzoom: 13,
-        iconSize: { z13: 0.08, z15: 0.12, z18: 0.16 },
-        textSize: { z13: 10, z16: 13 }
+        iconSize: { z13: 0.04, z15: 0.06, z18: 0.08 },
+        textSize: { z13: 10, z16: 13 },
+        textOffset: [0, 1.0]
+    }
+};
+
+// Contour layer styling — centralised for future admin/style_config control
+var CONTOUR_STYLES = {
+    minor: {
+        color: '#c4b990',
+        width: { z13: 0.3, z16: 0.6 },
+        opacity: { z13: 0.25, z15: 0.35, z16: 0.45 },
+        minzoom: 13
+    },
+    major: {
+        color: '#a89b70',
+        width: { z12: 0.5, z14: 0.8, z16: 1.2 },
+        opacity: { z12: 0.3, z14: 0.45, z16: 0.6 },
+        minzoom: 12
     }
 };
 
@@ -149,7 +166,70 @@ function loadStyleConfig() {
 
 // --- Data layers (Stage 2) ---
 function addDataLayers(config) {
-    // Sources
+    // Contour source
+    if (config.contoursTilesetId) {
+        map.addSource('rmm-contours', {
+            type: 'vector',
+            url: 'mapbox://' + config.contoursTilesetId
+        });
+
+        // 20m contours (minor — divisible by 20 but not 100)
+        map.addLayer({
+            id: 'rmm-contours-20m',
+            type: 'line',
+            source: 'rmm-contours',
+            'source-layer': '10m_Contours-57qbiw',
+            minzoom: CONTOUR_STYLES.minor.minzoom,
+            filter: [
+                'all',
+                ['==', ['%', ['get', 'ELEV'], 20], 0],
+                ['!=', ['%', ['get', 'ELEV'], 100], 0]
+            ],
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: {
+                'line-color': CONTOUR_STYLES.minor.color,
+                'line-width': [
+                    'interpolate', ['linear'], ['zoom'],
+                    13, CONTOUR_STYLES.minor.width.z13,
+                    16, CONTOUR_STYLES.minor.width.z16
+                ],
+                'line-opacity': [
+                    'interpolate', ['linear'], ['zoom'],
+                    13, CONTOUR_STYLES.minor.opacity.z13,
+                    15, CONTOUR_STYLES.minor.opacity.z15,
+                    16, CONTOUR_STYLES.minor.opacity.z16
+                ]
+            }
+        });
+
+        // 100m contours (major — divisible by 100)
+        map.addLayer({
+            id: 'rmm-contours-100m',
+            type: 'line',
+            source: 'rmm-contours',
+            'source-layer': '10m_Contours-57qbiw',
+            minzoom: CONTOUR_STYLES.major.minzoom,
+            filter: ['==', ['%', ['get', 'ELEV'], 100], 0],
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: {
+                'line-color': CONTOUR_STYLES.major.color,
+                'line-width': [
+                    'interpolate', ['linear'], ['zoom'],
+                    12, CONTOUR_STYLES.major.width.z12,
+                    14, CONTOUR_STYLES.major.width.z14,
+                    16, CONTOUR_STYLES.major.width.z16
+                ],
+                'line-opacity': [
+                    'interpolate', ['linear'], ['zoom'],
+                    12, CONTOUR_STYLES.major.opacity.z12,
+                    14, CONTOUR_STYLES.major.opacity.z14,
+                    16, CONTOUR_STYLES.major.opacity.z16
+                ]
+            }
+        });
+    }
+
+    // Trail + peak sources
     if (config.trailsTilesetId) {
         map.addSource('rmm-trails', {
             type: 'vector',
@@ -326,7 +406,7 @@ function addDataLayers(config) {
                     13, PEAK_STYLES.t2.textSize.z13,
                     16, PEAK_STYLES.t2.textSize.z16
                 ],
-                'text-offset': [0, 1.8],
+                'text-offset': PEAK_STYLES.t2.textOffset,
                 'text-anchor': 'top',
                 'text-max-width': 8,
                 'text-optional': true,

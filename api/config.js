@@ -21,6 +21,7 @@ module.exports = function handler(req, res) {
     res.status(200).json({
         token: token,
         styleUrl: styleUrl,
-        trailsTilesetId: process.env.TRAILS_TILESET_ID || ''
+        trailsTilesetId: process.env.TRAILS_TILESET_ID || '',
+        contoursTilesetId: process.env.CONTOURS_TILESET_ID || ''
     });
 };
