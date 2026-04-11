@@ -477,17 +477,11 @@
 }
 
 .dash-map-area {
-    height: 400px;
     background: var(--color-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dash-map-area p {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.25);
+    min-height: 500px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
 }
 
 /* Events panel — internal scroll */
@@ -767,7 +761,7 @@
     }
 
     .dash-map-area {
-        height: 280px;
+        min-height: 350px;
     }
 
     .dash-events-scroll {

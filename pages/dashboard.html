@@ -13,8 +13,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
     <link rel="stylesheet" href="/styles/components.css">
     <link rel="stylesheet" href="/styles/pages.css">
+    <link rel="stylesheet" href="/styles/map.css">
 </head>
 <body>
     <div class="page-shell">
@@ -48,7 +50,7 @@
                             <a href="/map" class="dash-panel-link">Full Screen &#8594;</a>
                         </div>
                         <div class="dash-map-area">
-                            <p>Map loads here</p>
+                            <div id="dashboard-map" class="map-panel-embed"></div>
                         </div>
                     </div>
 
@@ -253,5 +255,15 @@
         </div>
     </div>
     <script src="/scripts/components.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <script src="/scripts/map.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var container = document.getElementById('dashboard-map');
+            if (container) {
+                window.RMMMap.init('dashboard-map');
+            }
+        });
+    </script>
 </body>
 </html>
