@@ -104,6 +104,159 @@
     }
 }
 
+/* --- About page: intro body --- */
+.about-intro-body p {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    max-width: 760px;
+}
+
+/* --- About page: emphasis text (italic callouts) --- */
+.section-emphasis {
+    font-style: italic;
+    opacity: 0.85;
+    margin-top: 1.5rem;
+}
+
+/* --- About page: grade example callout --- */
+.about-grade-example {
+    background: #171A14;
+    color: #FFFFFF;
+    padding: 1.25rem 1.75rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.95rem;
+    margin: 1.5rem 0;
+    max-width: 760px;
+}
+
+/* --- About page: tables --- */
+.about-table-wrapper {
+    max-width: 760px;
+    margin: 2rem 0;
+}
+
+.about-table-heading {
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.about-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+}
+
+.about-table thead tr {
+    background: #C8553D;
+    color: #FFFFFF;
+}
+
+.about-table th {
+    padding: 0.6rem 1rem;
+    text-align: left;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.about-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid #ddd5c3;
+}
+
+.about-table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* --- About page: verdict cards --- */
+.about-verdicts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-width: 760px;
+    margin: 1.5rem 0;
+}
+
+.about-verdict {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.about-verdict strong {
+    min-width: 80px;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+.about-verdict-ready {
+    border-left: 3px solid #4a7c59;
+    background: rgba(74, 124, 89, 0.06);
+}
+
+.about-verdict-close {
+    border-left: 3px solid #c49a2a;
+    background: rgba(196, 154, 42, 0.06);
+}
+
+.about-verdict-notyet {
+    border-left: 3px solid #C8553D;
+    background: rgba(200, 85, 61, 0.06);
+}
+
+/* --- About page: founder role subtitle --- */
+.about-founder-role {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- About page: closing tagline --- */
+.about-closing {
+    padding: 4rem 0 2rem;
+    text-align: center;
+}
+
+.about-tagline {
+    font-family: 'Space Mono', monospace;
+    font-style: italic;
+    font-size: 1.1rem;
+    opacity: 0.6;
+}
+
+/* --- About page: mobile --- */
+@media (max-width: 768px) {
+    .about-grade-example {
+        font-size: 0.8rem;
+        padding: 1rem;
+    }
+
+    .about-table {
+        font-size: 0.75rem;
+    }
+
+    .about-table th,
+    .about-table td {
+        padding: 0.5rem 0.6rem;
+    }
+
+    .about-verdict {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .about-verdict strong {
+        min-width: unset;
+    }
+}
+
 
 /* --- SHOP PAGE --- */
 .shop-grid {
