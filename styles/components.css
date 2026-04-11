@@ -201,6 +201,33 @@
     margin-top: 0.25rem;
 }
 
+.footer-legal-links {
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.footer-legal-links a {
+    color: rgba(255, 255, 255, 0.35);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-legal-links a:hover {
+    color: var(--color-accent);
+}
+
+.footer-legal-links .sep {
+    margin: 0 0.4rem;
+    opacity: 0.5;
+}
+
 /* --- Shared Page Section Styles --- */
 .section {
     padding: 4rem 1.5rem;

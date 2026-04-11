@@ -64,6 +64,15 @@ function renderFooter() {
         '    <div class="footer-legal">',
         '        <p>&copy; ' + new Date().getFullYear() + ' Run Mad Maps. All rights reserved.</p>',
         '        <p class="footer-location">Cape Town, South Africa</p>',
+        '        <div class="footer-legal-links">',
+        '            <a href="/privacy">Privacy Policy</a>',
+        '            <span class="sep">&middot;</span>',
+        '            <a href="/terms">Terms of Service</a>',
+        '            <span class="sep">&middot;</span>',
+        '            <a href="/cookies">Cookie Policy</a>',
+        '            <span class="sep">&middot;</span>',
+        '            <a href="/acceptable-use">Acceptable Use</a>',
+        '        </div>',
         '    </div>',
         '</div>'
     ].join('');

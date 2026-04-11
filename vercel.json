@@ -12,7 +12,11 @@
     { "source": "/intelligence/readiness", "destination": "/pages/intelligence-readiness.html" },
     { "source": "/leaderboards", "destination": "/pages/leaderboards.html" },
     { "source": "/event", "destination": "/pages/event.html" },
-    { "source": "/privacy", "destination": "/pages/privacy.html" }
+    { "source": "/privacy", "destination": "/pages/privacy.html" },
+    { "source": "/terms", "destination": "/pages/terms.html" },
+    { "source": "/cookies", "destination": "/pages/cookies.html" },
+    { "source": "/acceptable-use", "destination": "/pages/acceptable-use.html" },
+    { "source": "/legal", "destination": "/pages/legal.html" }
   ],
   "headers": [
     {
