@@ -75,8 +75,10 @@ var MARKER_STYLES = {
                 t3: { file: '/public/icons/peaks/t3-peak-maclears-beacon.svg', size: 48, mapId: 'peak-maclears-beacon-t3' }
             }
         },
-        zoomBreaks: { t1: [8, 11], t2: [11, 13], t3: [13, 15] },
-        filter: null
+        iconSwitch: 13,   // zoom where T1 → T2 icon
+        filter: null,
+        layerId: 'peaks',
+        hoverLayerId: 'peaks-t3-hover'
     },
     caves: {
         source: 'caves',
@@ -92,8 +94,10 @@ var MARKER_STYLES = {
                 t3: { file: '/public/icons/caves/t3-cave-boomslang-cave.svg', size: 48, mapId: 'cave-boomslang-cave-t3' }
             }
         },
-        zoomBreaks: { t1: [8, 11], t2: [11, 13], t3: [13, 15] },
-        filter: ['has', 'name']
+        iconSwitch: 13,
+        filter: ['has', 'name'],
+        layerId: 'caves',
+        hoverLayerId: 'caves-t3-hover'
     }
 };
 
@@ -169,26 +173,16 @@ function loadAllMarkerIcons() {
     return Promise.all(promises);
 }
 
-// --- Build T3 match expression for icon-image from MARKER_STYLES bespoke config ---
-// Updating MARKER_STYLES.bespoke is the only change needed to add a new bespoke marker.
-function buildT3ImageMatch(category, fallbackId) {
+// --- Build match expression for T3 hover layer icon-image ---
+// Returns a GL match expression: named bespoke features → their T3 mapId, fallback → '' (no icon).
+// Adding a bespoke marker only requires a MARKER_STYLES.bespoke config entry — no layer code changes.
+function buildBespokeMatchExpr(category) {
     var bespoke = MARKER_STYLES[category].bespoke;
     var names = Object.keys(bespoke).filter(function(n) { return bespoke[n].t3; });
-    if (names.length === 0) return fallbackId;
+    if (names.length === 0) return '';
     var expr = ['match', ['get', 'name']];
     names.forEach(function(n) { expr.push(n, bespoke[n].t3.mapId); });
-    expr.push(fallbackId);
-    return expr;
-}
-
-// --- Build T3 match expression for icon-size from MARKER_STYLES bespoke config ---
-function buildT3SizeMatch(category, fallbackSize) {
-    var bespoke = MARKER_STYLES[category].bespoke;
-    var names = Object.keys(bespoke).filter(function(n) { return bespoke[n].t3; });
-    if (names.length === 0) return fallbackSize;
-    var expr = ['match', ['get', 'name']];
-    names.forEach(function(n) { expr.push(n, 1); });
-    expr.push(fallbackSize);
+    expr.push('');  // fallback: empty string = no icon rendered
     return expr;
 }
 
@@ -257,51 +251,50 @@ function loadStyleConfig() {
     });
 }
 
-// --- Peak marker layers (T1, T2, T3) ---
+// --- Peak marker layers — single layer (full zoom coverage) + T3 hover layer ---
 function addPeakLayers() {
     var cat = MARKER_STYLES.peaks;
 
-    // T1 — icon only, zoom 8–11
+    // Base layer — always visible from zoom 8, no maxzoom, no gaps
     map.addLayer({
-        id: 'rmm-peaks-t1',
+        id: cat.layerId,
         type: 'symbol',
         source: cat.source,
-        minzoom: cat.zoomBreaks.t1[0],
-        maxzoom: cat.zoomBreaks.t1[1],
+        minzoom: 8,
         layout: {
-            'icon-image': cat.icons.t1.mapId,
-            'icon-size': 1,
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': false,
-            'symbol-sort-key': ['case', ['has', 'ele'], ['-', ['get', 'ele']], 0]
-        }
-    });
-
-    // T2 — icon + label, zoom 11–13
-    map.addLayer({
-        id: 'rmm-peaks-t2',
-        type: 'symbol',
-        source: cat.source,
-        minzoom: cat.zoomBreaks.t2[0],
-        maxzoom: cat.zoomBreaks.t2[1],
-        layout: {
-            'icon-image': cat.icons.t2.mapId,
-            'icon-size': 1,
-            'icon-allow-overlap': true,
-            'icon-ignore-placement': false,
-            'text-field': [
-                'case',
-                ['has', 'ele'],
-                ['concat', ['get', 'name'], '\n', ['to-string', ['get', 'ele']], 'm'],
-                ['get', 'name']
+            'icon-image': [
+                'step', ['zoom'],
+                cat.icons.t1.mapId,
+                cat.iconSwitch, cat.icons.t2.mapId
             ],
-            'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
-            'text-size': 11,
+            'icon-size': [
+                'interpolate', ['linear'], ['zoom'],
+                8,  0.25,
+                10, 0.3,
+                12, 0.35,
+                13, 0.3,
+                15, 0.35,
+                18, 0.25
+            ],
+            'icon-allow-overlap': [
+                'step', ['zoom'],
+                false,
+                13, true
+            ],
+            'text-field': [
+                'step', ['zoom'],
+                '',
+                13, ['get', 'name']
+            ],
             'text-offset': [0, 1.2],
+            'text-size': [
+                'interpolate', ['linear'], ['zoom'],
+                13, 10,
+                15, 12
+            ],
             'text-anchor': 'top',
-            'text-max-width': 8,
-            'text-optional': true,
-            'symbol-sort-key': ['case', ['has', 'ele'], ['-', ['get', 'ele']], 0]
+            'text-font': ['Space Mono Regular', 'DIN Pro Regular', 'Arial Unicode MS Regular'],
+            'text-optional': true
         },
         paint: {
             'text-color': '#FFFFFF',
@@ -310,68 +303,76 @@ function addPeakLayers() {
         }
     });
 
-    // T3 — bespoke illustrated icons, zoom 13–15
-    // Peaks with a bespoke entry show their custom icon; all others fall back to T2 generic
+    // T3 hover layer — hidden by default (filter matches nothing), shown on mouseenter
     map.addLayer({
-        id: 'peaks-t3',
+        id: cat.hoverLayerId,
         type: 'symbol',
         source: cat.source,
-        minzoom: cat.zoomBreaks.t3[0],
-        maxzoom: cat.zoomBreaks.t3[1],
         layout: {
-            'icon-image': buildT3ImageMatch('peaks', cat.icons.t2.mapId),
-            'icon-size': buildT3SizeMatch('peaks', 0.75),
+            'icon-image': buildBespokeMatchExpr('peaks'),
+            'icon-size': 0.5,
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-offset': [0, 1.8],
-            'text-size': 12,
+            'text-size': 13,
             'text-anchor': 'top',
-            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold']
+            'text-font': ['Space Mono Regular', 'DIN Pro Regular', 'Arial Unicode MS Regular'],
+            'text-optional': true
         },
         paint: {
             'text-color': '#FFFFFF',
             'text-halo-color': '#171A14',
             'text-halo-width': 2
-        }
+        },
+        filter: ['==', ['get', 'name'], '']  // matches nothing — hidden until hover
     });
 }
 
-// --- Cave marker layers (T1, T2, T3) ---
+// --- Cave marker layers — single layer (full zoom coverage) + T3 hover layer ---
 function addCaveLayers() {
     var cat = MARKER_STYLES.caves;
 
-    // T1 — icon only, zoom 8–11 (named caves only)
+    // Base layer — always visible from zoom 8, no maxzoom, no gaps
     map.addLayer({
-        id: 'caves-t1',
+        id: cat.layerId,
         type: 'symbol',
         source: cat.source,
-        minzoom: cat.zoomBreaks.t1[0],
-        maxzoom: cat.zoomBreaks.t1[1],
+        minzoom: 8,
         filter: cat.filter,
         layout: {
-            'icon-image': cat.icons.t1.mapId,
-            'icon-size': 0.75,
-            'icon-allow-overlap': false
-        }
-    });
-
-    // T2 — icon + label, zoom 11–13
-    map.addLayer({
-        id: 'caves-t2',
-        type: 'symbol',
-        source: cat.source,
-        minzoom: cat.zoomBreaks.t2[0],
-        maxzoom: cat.zoomBreaks.t2[1],
-        filter: cat.filter,
-        layout: {
-            'icon-image': cat.icons.t2.mapId,
-            'icon-size': 0.85,
-            'icon-allow-overlap': true,
-            'text-field': ['get', 'name'],
-            'text-offset': [0, 1.5],
-            'text-size': 11,
+            'icon-image': [
+                'step', ['zoom'],
+                cat.icons.t1.mapId,
+                cat.iconSwitch, cat.icons.t2.mapId
+            ],
+            'icon-size': [
+                'interpolate', ['linear'], ['zoom'],
+                8,  0.25,
+                10, 0.3,
+                12, 0.35,
+                13, 0.3,
+                15, 0.35,
+                18, 0.25
+            ],
+            'icon-allow-overlap': [
+                'step', ['zoom'],
+                false,
+                13, true
+            ],
+            'text-field': [
+                'step', ['zoom'],
+                '',
+                13, ['get', 'name']
+            ],
+            'text-offset': [0, 1.2],
+            'text-size': [
+                'interpolate', ['linear'], ['zoom'],
+                13, 10,
+                15, 12
+            ],
             'text-anchor': 'top',
-            'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular']
+            'text-font': ['Space Mono Regular', 'DIN Pro Regular', 'Arial Unicode MS Regular'],
+            'text-optional': true
         },
         paint: {
             'text-color': '#FFFFFF',
@@ -380,30 +381,89 @@ function addCaveLayers() {
         }
     });
 
-    // T3 — bespoke illustrated icons, zoom 13–15
-    // Boomslang Cave entrances show bespoke icon; all others fall back to T2 generic
+    // T3 hover layer — hidden by default, shown on mouseenter
     map.addLayer({
-        id: 'caves-t3',
+        id: cat.hoverLayerId,
         type: 'symbol',
         source: cat.source,
-        minzoom: cat.zoomBreaks.t3[0],
-        maxzoom: cat.zoomBreaks.t3[1],
-        filter: cat.filter,
         layout: {
-            'icon-image': buildT3ImageMatch('caves', cat.icons.t2.mapId),
-            'icon-size': buildT3SizeMatch('caves', 0.75),
+            'icon-image': buildBespokeMatchExpr('caves'),
+            'icon-size': 0.5,
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-offset': [0, 1.8],
-            'text-size': 12,
+            'text-size': 13,
             'text-anchor': 'top',
-            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold']
+            'text-font': ['Space Mono Regular', 'DIN Pro Regular', 'Arial Unicode MS Regular'],
+            'text-optional': true
         },
         paint: {
             'text-color': '#FFFFFF',
             'text-halo-color': '#171A14',
             'text-halo-width': 2
-        }
+        },
+        filter: ['==', ['get', 'name'], '']  // matches nothing — hidden until hover
+    });
+}
+
+// --- T3 hover interactions ---
+// Swaps base layer icon → bespoke T3 icon on mouseenter/click for bespoke-named features.
+// Reverts on mouseleave or (mobile) after 3 seconds.
+function setupHoverInteractions() {
+    Object.keys(MARKER_STYLES).forEach(function(category) {
+        var cat = MARKER_STYLES[category];
+        var baseId = cat.layerId;
+        var hoverId = cat.hoverLayerId;
+        var originalFilter = cat.filter;
+
+        // Collect bespoke names for this category
+        var bespokeNames = Object.keys(cat.bespoke).filter(function(n) {
+            return cat.bespoke[n].t3;
+        });
+        if (bespokeNames.length === 0) return;
+
+        // Desktop — mouseenter: show T3, hide from base
+        map.on('mouseenter', baseId, function(e) {
+            var name = e.features[0].properties.name;
+            if (bespokeNames.indexOf(name) !== -1) {
+                map.getCanvas().style.cursor = 'pointer';
+                map.setFilter(hoverId, ['==', ['get', 'name'], name]);
+                var baseFilter = originalFilter
+                    ? ['all', originalFilter, ['!=', ['get', 'name'], name]]
+                    : ['!=', ['get', 'name'], name];
+                map.setFilter(baseId, baseFilter);
+            }
+        });
+
+        // Desktop — mouseleave from base layer: revert
+        map.on('mouseleave', baseId, function() {
+            map.getCanvas().style.cursor = '';
+            map.setFilter(hoverId, ['==', ['get', 'name'], '']);
+            map.setFilter(baseId, originalFilter);
+        });
+
+        // Desktop — mouseleave from hover layer: revert (mouse moved to hover layer not base)
+        map.on('mouseleave', hoverId, function() {
+            map.getCanvas().style.cursor = '';
+            map.setFilter(hoverId, ['==', ['get', 'name'], '']);
+            map.setFilter(baseId, originalFilter);
+        });
+
+        // Mobile — tap on base layer: show T3, revert after 3 seconds
+        map.on('click', baseId, function(e) {
+            var name = e.features[0].properties.name;
+            if (bespokeNames.indexOf(name) !== -1) {
+                map.setFilter(hoverId, ['==', ['get', 'name'], name]);
+                var baseFilter = originalFilter
+                    ? ['all', originalFilter, ['!=', ['get', 'name'], name]]
+                    : ['!=', ['get', 'name'], name];
+                map.setFilter(baseId, baseFilter);
+                setTimeout(function() {
+                    map.setFilter(hoverId, ['==', ['get', 'name'], '']);
+                    map.setFilter(baseId, originalFilter);
+                }, 3000);
+            }
+        });
     });
 }
 
@@ -579,6 +639,7 @@ function addDataLayers(config) {
     // Marker layers — peaks then caves
     addPeakLayers();
     addCaveLayers();
+    setupHoverInteractions();
 }
 
 // --- Map initialisation ---
