@@ -115,8 +115,15 @@ function showMapError(containerId) {
     ].join('');
 }
 
-// --- SVG icon loader — renders SVG to canvas, adds to map as ImageData ---
-function loadSVGAsMapIcon(url, iconId, size) {
+// --- SVG icon loader — fetch → blob URL → canvas → ImageData ---
+// Blob URL approach avoids CORS issues that can occur with direct SVG src-to-canvas rendering.
+async function loadSVGAsMapIcon(url, iconId, size) {
+    var response = await fetch(url);
+    if (!response.ok) throw new Error('HTTP ' + response.status + ' loading ' + url);
+    var svgText = await response.text();
+    var blob = new Blob([svgText], { type: 'image/svg+xml' });
+    var dataUrl = URL.createObjectURL(blob);
+
     return new Promise(function(resolve, reject) {
         var img = new Image();
         img.onload = function() {
@@ -125,12 +132,19 @@ function loadSVGAsMapIcon(url, iconId, size) {
             canvas.height = size;
             var ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, size, size);
-            var imageData = ctx.getImageData(0, 0, size, size);
-            map.addImage(iconId, imageData);
+            if (!map.hasImage(iconId)) {
+                map.addImage(iconId, ctx.getImageData(0, 0, size, size));
+            }
+            URL.revokeObjectURL(dataUrl);
+            console.log('RMM: icon loaded —', iconId);
             resolve();
         };
-        img.onerror = reject;
-        img.src = url;
+        img.onerror = function(e) {
+            console.error('RMM: Failed to load icon', iconId, 'from', url, e);
+            URL.revokeObjectURL(dataUrl);
+            reject(e);
+        };
+        img.src = dataUrl;
     });
 }
 
@@ -269,12 +283,12 @@ function addPeakLayers() {
             ],
             'icon-size': [
                 'interpolate', ['linear'], ['zoom'],
-                8,  0.25,
-                10, 0.3,
-                12, 0.35,
-                13, 0.3,
-                15, 0.35,
-                18, 0.25
+                8,  0.5,
+                10, 0.6,
+                12, 0.7,
+                13, 0.6,
+                15, 0.7,
+                18, 0.5
             ],
             'icon-allow-overlap': [
                 'step', ['zoom'],
@@ -310,7 +324,7 @@ function addPeakLayers() {
         source: cat.source,
         layout: {
             'icon-image': buildBespokeMatchExpr('peaks'),
-            'icon-size': 0.5,
+            'icon-size': 1.0,
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-offset': [0, 1.8],
@@ -347,12 +361,12 @@ function addCaveLayers() {
             ],
             'icon-size': [
                 'interpolate', ['linear'], ['zoom'],
-                8,  0.25,
-                10, 0.3,
-                12, 0.35,
-                13, 0.3,
-                15, 0.35,
-                18, 0.25
+                8,  0.5,
+                10, 0.6,
+                12, 0.7,
+                13, 0.6,
+                15, 0.7,
+                18, 0.5
             ],
             'icon-allow-overlap': [
                 'step', ['zoom'],
@@ -388,7 +402,7 @@ function addCaveLayers() {
         source: cat.source,
         layout: {
             'icon-image': buildBespokeMatchExpr('caves'),
-            'icon-size': 0.5,
+            'icon-size': 1.0,
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-offset': [0, 1.8],
@@ -442,7 +456,12 @@ function setupHoverInteractions() {
             map.setFilter(baseId, originalFilter);
         });
 
-        // Desktop — mouseleave from hover layer: revert (mouse moved to hover layer not base)
+        // Desktop — mouseenter on hover layer: keep pointer cursor (prevents flicker)
+        map.on('mouseenter', hoverId, function() {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Desktop — mouseleave from hover layer: revert (mouse moved off hover layer)
         map.on('mouseleave', hoverId, function() {
             map.getCanvas().style.cursor = '';
             map.setFilter(hoverId, ['==', ['get', 'name'], '']);
