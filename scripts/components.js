@@ -1,7 +1,8 @@
 // Shared site components — nav and footer
-// Injected into every page except landing curtain
+// Injected into every page via components.js
 
 function renderNav() {
+    var isAdmin = localStorage.getItem('rmm_admin') === 'true';
     var nav = document.createElement('header');
     nav.className = 'site-nav';
     nav.innerHTML = [
@@ -11,12 +12,12 @@ function renderNav() {
         '        <span class="nav-brand">RUN MAD MAPS</span>',
         '    </a>',
         '    <nav class="nav-links">',
-        '        <a href="/map" class="nav-link">Map</a>',
+        '        <a href="/" class="nav-link">Map</a>',
         '        <a href="/about" class="nav-link">About</a>',
-        '        <a href="/shop" class="nav-link">Shop</a>',
-        '        <a href="/intelligence" class="nav-link">Intelligence</a>',
-        '        <a href="/leaderboards" class="nav-link">Leaderboards</a>',
-        '        <a href="/dashboard" class="nav-link nav-link-gated">Dashboard</a>',
+        (isAdmin ? '        <a href="/shop" class="nav-link">Shop</a>' : ''),
+        (isAdmin ? '        <a href="/intelligence" class="nav-link">Intelligence</a>' : ''),
+        (isAdmin ? '        <a href="/leaderboards" class="nav-link">Leaderboards</a>' : ''),
+        (isAdmin ? '        <a href="/dashboard" class="nav-link nav-link-gated">Dashboard</a>' : ''),
         '    </nav>',
         '    <button class="nav-toggle" aria-label="Toggle menu">',
         '        <span></span>',
@@ -27,10 +28,13 @@ function renderNav() {
     ].join('');
     document.body.prepend(nav);
 
-    // Highlight current page
+    // Highlight current page — treat /map same as /
     var path = window.location.pathname;
+    var normPath = (path === '/map') ? '/' : path;
     nav.querySelectorAll('.nav-link').forEach(function(link) {
-        if (link.getAttribute('href') === path) {
+        var href = link.getAttribute('href');
+        var normHref = (href === '/map') ? '/' : href;
+        if (normHref === normPath) {
             link.classList.add('active');
         }
     });
@@ -45,6 +49,7 @@ function renderNav() {
 }
 
 function renderFooter() {
+    var isAdmin = localStorage.getItem('rmm_admin') === 'true';
     var footer = document.createElement('footer');
     footer.className = 'site-footer';
     footer.innerHTML = [
@@ -54,12 +59,12 @@ function renderFooter() {
         '        <p class="footer-tagline">Your Cape Peninsula Trail Intelligence Companion</p>',
         '    </div>',
         '    <div class="footer-links">',
-        '        <a href="/map">Map</a>',
+        '        <a href="/">Map</a>',
         '        <a href="/about">About</a>',
-        '        <a href="/shop">Shop</a>',
-        '        <a href="/intelligence">Intelligence</a>',
-        '        <a href="/leaderboards">Leaderboards</a>',
-        '        <a href="/dashboard">Dashboard</a>',
+        (isAdmin ? '        <a href="/shop">Shop</a>' : ''),
+        (isAdmin ? '        <a href="/intelligence">Intelligence</a>' : ''),
+        (isAdmin ? '        <a href="/leaderboards">Leaderboards</a>' : ''),
+        (isAdmin ? '        <a href="/dashboard">Dashboard</a>' : ''),
         '    </div>',
         '    <div class="footer-legal">',
         '        <p>&copy; ' + new Date().getFullYear() + ' Run Mad Maps. All rights reserved.</p>',
@@ -81,5 +86,9 @@ function renderFooter() {
 
 document.addEventListener('DOMContentLoaded', function() {
     renderNav();
-    renderFooter();
+    // Skip footer on map page — map is full-bleed, no footer
+    var path = window.location.pathname;
+    if (path !== '/' && path !== '/map') {
+        renderFooter();
+    }
 });

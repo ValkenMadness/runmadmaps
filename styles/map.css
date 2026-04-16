@@ -66,6 +66,191 @@
     font-size: 14px;
 }
 
+/* ============================================
+   Email Signup Overlay
+   ============================================ */
+
+/* Backdrop */
+.rmm-overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(23, 26, 20, 0.6);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rmm-overlay-backdrop.hidden {
+    display: none;
+}
+
+/* Card */
+.rmm-overlay-card {
+    background: #171A14;
+    border: 1px solid #2a2e24;
+    border-radius: 12px;
+    padding: 40px 36px 32px;
+    max-width: 400px;
+    width: calc(100% - 32px);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rmm-overlay-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b7560;
+    margin: 0;
+}
+
+.rmm-overlay-headline {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.rmm-overlay-body {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    color: #a8b09e;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Form fields */
+.rmm-overlay-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.rmm-overlay-field input {
+    background: #1e2419;
+    border: 1px solid #2a2e24;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82rem;
+    padding: 10px 14px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.rmm-overlay-field input::placeholder {
+    color: #4a5240;
+}
+
+.rmm-overlay-field input:focus {
+    border-color: #4a5a3a;
+}
+
+/* Submit button */
+.rmm-overlay-submit {
+    background: #FF4E50;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 12px 24px;
+    cursor: pointer;
+    width: 100%;
+    letter-spacing: 0.05em;
+}
+
+.rmm-overlay-submit:hover {
+    background: #e83d3f;
+}
+
+.rmm-overlay-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Consent */
+.rmm-overlay-consent {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.rmm-overlay-consent input[type="checkbox"] {
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: #FF4E50;
+}
+
+.rmm-overlay-consent label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: #6b7560;
+    line-height: 1.5;
+}
+
+.rmm-overlay-consent label a {
+    color: #a8b09e;
+    text-decoration: underline;
+}
+
+/* Error / Success messages */
+.rmm-overlay-error {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: #FF4E50;
+    margin: 0;
+    min-height: 1em;
+}
+
+.rmm-overlay-success {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: #a8b09e;
+    text-align: center;
+    margin: 8px 0 0;
+}
+
+/* Dismiss link */
+.rmm-overlay-dismiss {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: #4a5240;
+    text-align: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.rmm-overlay-dismiss:hover {
+    color: #6b7560;
+}
+
+/* --- Mobile — sheet from bottom --- */
+@media (max-width: 480px) {
+    .rmm-overlay-backdrop {
+        align-items: flex-end;
+    }
+
+    .rmm-overlay-card {
+        border-radius: 16px 16px 0 0;
+        max-width: 100%;
+        width: 100%;
+        padding: 32px 24px 40px;
+    }
+}
+
 /* --- Mobile --- */
 @media (max-width: 768px) {
     #map-container {

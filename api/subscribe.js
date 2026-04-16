@@ -31,6 +31,10 @@ export default async function handler(req, res) {
   var name = body.name.trim();
   var email = body.email.trim().toLowerCase();
 
+  // Optional source — sanitize to alphanumeric, hyphens, underscores only
+  var rawSource = (body.source && typeof body.source === 'string') ? body.source : '';
+  var source = rawSource.replace(/[^a-zA-Z0-9_\-]/g, '').slice(0, 64) || 'landing_page';
+
   // Basic email validation
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Invalid email format.' });
@@ -59,7 +63,7 @@ export default async function handler(req, res) {
         email: email,
         first_name: name,
         consent_given: true,
-        source: 'landing_page'
+        source: source
       })
     });
 

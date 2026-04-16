@@ -1,6 +1,7 @@
 /* ============================================
-   RUN MAD MAPS — Map Module (Stage 1)
-   GL JS Foundation, 3D Terrain, Fog, Token Delivery
+   RUN MAD MAPS — Map Module
+   GL JS Foundation, 3D Terrain, Fog, Token Delivery,
+   Trail Layers, Peak + Cave Markers (T1–T3)
    ============================================ */
 
 // Supabase public config (anon key is safe to expose client-side)
@@ -48,24 +49,6 @@ var TRAIL_STYLES = {
     }
 };
 
-// Peak layer styling — centralised for future admin/style_config control
-var PEAK_STYLES = {
-    textColor: '#171A14',
-    textHaloColor: '#FFF1D4',
-    textHaloWidth: 2,
-    t1: {
-        minzoom: 8,
-        maxzoom: 13,
-        iconSize: { z8: 0.04, z11: 0.06, z13: 0.075 }
-    },
-    t2: {
-        minzoom: 13,
-        iconSize: { z13: 0.04, z15: 0.06, z18: 0.08 },
-        textSize: { z13: 10, z16: 13 },
-        textOffset: [0, 1.0]
-    }
-};
-
 // Contour layer styling — centralised for future admin/style_config control
 var CONTOUR_STYLES = {
     majorColor: '#a89b70',
@@ -75,6 +58,43 @@ var CONTOUR_STYLES = {
     majorOpacity: { z12: 0.2, z13: 0.25, z16: 0.3 },
     minorOpacity: { z12: 0,   z13: 0.25, z16: 0.4 },
     minzoom: 12
+};
+
+// Marker config — all GeoJSON point feature categories
+// To add a new bespoke marker: add an entry to the relevant category's `bespoke` object only.
+// No layer code changes required.
+var MARKER_STYLES = {
+    peaks: {
+        source: 'peaks',
+        icons: {
+            t1: { file: '/public/icons/peaks/t1-peak-generic.svg', size: 24, mapId: 'peak-t1' },
+            t2: { file: '/public/icons/peaks/t2-peak-generic.svg', size: 32, mapId: 'peak-t2' }
+        },
+        bespoke: {
+            "Maclear's Beacon": {
+                t3: { file: '/public/icons/peaks/t3-peak-maclears-beacon.svg', size: 48, mapId: 'peak-maclears-beacon-t3' }
+            }
+        },
+        zoomBreaks: { t1: [8, 11], t2: [11, 13], t3: [13, 15] },
+        filter: null
+    },
+    caves: {
+        source: 'caves',
+        icons: {
+            t1: { file: '/public/icons/caves/t1-cave-generic.svg', size: 24, mapId: 'cave-t1' },
+            t2: { file: '/public/icons/caves/t2-cave-generic.svg', size: 32, mapId: 'cave-t2' }
+        },
+        bespoke: {
+            'Boomslang Cave North Entrance': {
+                t3: { file: '/public/icons/caves/t3-cave-boomslang-cave.svg', size: 48, mapId: 'cave-boomslang-cave-t3' }
+            },
+            'Boomslang Cave South Entrance': {
+                t3: { file: '/public/icons/caves/t3-cave-boomslang-cave.svg', size: 48, mapId: 'cave-boomslang-cave-t3' }
+            }
+        },
+        zoomBreaks: { t1: [8, 11], t2: [11, 13], t3: [13, 15] },
+        filter: ['has', 'name']
+    }
 };
 
 var map = null;
@@ -89,6 +109,87 @@ function showMapError(containerId) {
         '    <p>Map unavailable. Please try again shortly.</p>',
         '</div>'
     ].join('');
+}
+
+// --- SVG icon loader — renders SVG to canvas, adds to map as ImageData ---
+function loadSVGAsMapIcon(url, iconId, size) {
+    return new Promise(function(resolve, reject) {
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, size, size);
+            var imageData = ctx.getImageData(0, 0, size, size);
+            map.addImage(iconId, imageData);
+            resolve();
+        };
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+
+// --- Load all marker icons from MARKER_STYLES (generic + bespoke, deduplicated) ---
+function loadAllMarkerIcons() {
+    var promises = [];
+    var loaded = {};  // track mapIds already queued — multiple features can share one icon file
+
+    Object.keys(MARKER_STYLES).forEach(function(category) {
+        var cat = MARKER_STYLES[category];
+
+        // Generic icons (t1, t2)
+        Object.keys(cat.icons).forEach(function(state) {
+            var icon = cat.icons[state];
+            if (!loaded[icon.mapId]) {
+                loaded[icon.mapId] = true;
+                promises.push(
+                    loadSVGAsMapIcon(icon.file, icon.mapId, icon.size)
+                        .catch(function() { console.warn('RMM: Failed to load icon', icon.mapId); })
+                );
+            }
+        });
+
+        // Bespoke icons (t3)
+        Object.keys(cat.bespoke).forEach(function(featureName) {
+            var states = cat.bespoke[featureName];
+            Object.keys(states).forEach(function(state) {
+                var icon = states[state];
+                if (!loaded[icon.mapId]) {
+                    loaded[icon.mapId] = true;
+                    promises.push(
+                        loadSVGAsMapIcon(icon.file, icon.mapId, icon.size)
+                            .catch(function() { console.warn('RMM: Failed to load icon', icon.mapId); })
+                    );
+                }
+            });
+        });
+    });
+
+    return Promise.all(promises);
+}
+
+// --- Build T3 match expression for icon-image from MARKER_STYLES bespoke config ---
+// Updating MARKER_STYLES.bespoke is the only change needed to add a new bespoke marker.
+function buildT3ImageMatch(category, fallbackId) {
+    var bespoke = MARKER_STYLES[category].bespoke;
+    var names = Object.keys(bespoke).filter(function(n) { return bespoke[n].t3; });
+    if (names.length === 0) return fallbackId;
+    var expr = ['match', ['get', 'name']];
+    names.forEach(function(n) { expr.push(n, bespoke[n].t3.mapId); });
+    expr.push(fallbackId);
+    return expr;
+}
+
+// --- Build T3 match expression for icon-size from MARKER_STYLES bespoke config ---
+function buildT3SizeMatch(category, fallbackSize) {
+    var bespoke = MARKER_STYLES[category].bespoke;
+    var names = Object.keys(bespoke).filter(function(n) { return bespoke[n].t3; });
+    if (names.length === 0) return fallbackSize;
+    var expr = ['match', ['get', 'name']];
+    names.forEach(function(n) { expr.push(n, 1); });
+    expr.push(fallbackSize);
+    return expr;
 }
 
 // --- style_config loader ---
@@ -110,13 +211,11 @@ function loadStyleConfig() {
     .then(function(rows) {
         if (!rows || !Array.isArray(rows) || rows.length === 0) return;
 
-        // Build a key→value map
         var config = {};
         rows.forEach(function(row) {
             config[row.key] = row.value;
         });
 
-        // Apply camera overrides
         var cameraUpdate = {};
         var hasCameraUpdate = false;
 
@@ -146,7 +245,6 @@ function loadStyleConfig() {
             map.easeTo(cameraUpdate);
         }
 
-        // Apply terrain exaggeration override
         if (config.terrain_exaggeration) {
             map.setTerrain({
                 source: 'mapbox-dem',
@@ -156,6 +254,156 @@ function loadStyleConfig() {
     })
     .catch(function() {
         // Supabase unreachable — continue with defaults, no error thrown
+    });
+}
+
+// --- Peak marker layers (T1, T2, T3) ---
+function addPeakLayers() {
+    var cat = MARKER_STYLES.peaks;
+
+    // T1 — icon only, zoom 8–11
+    map.addLayer({
+        id: 'rmm-peaks-t1',
+        type: 'symbol',
+        source: cat.source,
+        minzoom: cat.zoomBreaks.t1[0],
+        maxzoom: cat.zoomBreaks.t1[1],
+        layout: {
+            'icon-image': cat.icons.t1.mapId,
+            'icon-size': 1,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': false,
+            'symbol-sort-key': ['case', ['has', 'ele'], ['-', ['get', 'ele']], 0]
+        }
+    });
+
+    // T2 — icon + label, zoom 11–13
+    map.addLayer({
+        id: 'rmm-peaks-t2',
+        type: 'symbol',
+        source: cat.source,
+        minzoom: cat.zoomBreaks.t2[0],
+        maxzoom: cat.zoomBreaks.t2[1],
+        layout: {
+            'icon-image': cat.icons.t2.mapId,
+            'icon-size': 1,
+            'icon-allow-overlap': true,
+            'icon-ignore-placement': false,
+            'text-field': [
+                'case',
+                ['has', 'ele'],
+                ['concat', ['get', 'name'], '\n', ['to-string', ['get', 'ele']], 'm'],
+                ['get', 'name']
+            ],
+            'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+            'text-size': 11,
+            'text-offset': [0, 1.2],
+            'text-anchor': 'top',
+            'text-max-width': 8,
+            'text-optional': true,
+            'symbol-sort-key': ['case', ['has', 'ele'], ['-', ['get', 'ele']], 0]
+        },
+        paint: {
+            'text-color': '#FFFFFF',
+            'text-halo-color': '#171A14',
+            'text-halo-width': 2
+        }
+    });
+
+    // T3 — bespoke illustrated icons, zoom 13–15
+    // Peaks with a bespoke entry show their custom icon; all others fall back to T2 generic
+    map.addLayer({
+        id: 'peaks-t3',
+        type: 'symbol',
+        source: cat.source,
+        minzoom: cat.zoomBreaks.t3[0],
+        maxzoom: cat.zoomBreaks.t3[1],
+        layout: {
+            'icon-image': buildT3ImageMatch('peaks', cat.icons.t2.mapId),
+            'icon-size': buildT3SizeMatch('peaks', 0.75),
+            'icon-allow-overlap': true,
+            'text-field': ['get', 'name'],
+            'text-offset': [0, 1.8],
+            'text-size': 12,
+            'text-anchor': 'top',
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold']
+        },
+        paint: {
+            'text-color': '#FFFFFF',
+            'text-halo-color': '#171A14',
+            'text-halo-width': 2
+        }
+    });
+}
+
+// --- Cave marker layers (T1, T2, T3) ---
+function addCaveLayers() {
+    var cat = MARKER_STYLES.caves;
+
+    // T1 — icon only, zoom 8–11 (named caves only)
+    map.addLayer({
+        id: 'caves-t1',
+        type: 'symbol',
+        source: cat.source,
+        minzoom: cat.zoomBreaks.t1[0],
+        maxzoom: cat.zoomBreaks.t1[1],
+        filter: cat.filter,
+        layout: {
+            'icon-image': cat.icons.t1.mapId,
+            'icon-size': 0.75,
+            'icon-allow-overlap': false
+        }
+    });
+
+    // T2 — icon + label, zoom 11–13
+    map.addLayer({
+        id: 'caves-t2',
+        type: 'symbol',
+        source: cat.source,
+        minzoom: cat.zoomBreaks.t2[0],
+        maxzoom: cat.zoomBreaks.t2[1],
+        filter: cat.filter,
+        layout: {
+            'icon-image': cat.icons.t2.mapId,
+            'icon-size': 0.85,
+            'icon-allow-overlap': true,
+            'text-field': ['get', 'name'],
+            'text-offset': [0, 1.5],
+            'text-size': 11,
+            'text-anchor': 'top',
+            'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular']
+        },
+        paint: {
+            'text-color': '#FFFFFF',
+            'text-halo-color': '#171A14',
+            'text-halo-width': 2
+        }
+    });
+
+    // T3 — bespoke illustrated icons, zoom 13–15
+    // Boomslang Cave entrances show bespoke icon; all others fall back to T2 generic
+    map.addLayer({
+        id: 'caves-t3',
+        type: 'symbol',
+        source: cat.source,
+        minzoom: cat.zoomBreaks.t3[0],
+        maxzoom: cat.zoomBreaks.t3[1],
+        filter: cat.filter,
+        layout: {
+            'icon-image': buildT3ImageMatch('caves', cat.icons.t2.mapId),
+            'icon-size': buildT3SizeMatch('caves', 0.75),
+            'icon-allow-overlap': true,
+            'text-field': ['get', 'name'],
+            'text-offset': [0, 1.8],
+            'text-size': 12,
+            'text-anchor': 'top',
+            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold']
+        },
+        paint: {
+            'text-color': '#FFFFFF',
+            'text-halo-color': '#171A14',
+            'text-halo-width': 2
+        }
     });
 }
 
@@ -200,7 +448,7 @@ function addDataLayers(config) {
         });
     }
 
-    // Trail + peak sources
+    // Trail tileset source
     if (config.trailsTilesetId) {
         map.addSource('rmm-trails', {
             type: 'vector',
@@ -208,9 +456,14 @@ function addDataLayers(config) {
         });
     }
 
-    map.addSource('rmm-peaks', {
+    // GeoJSON sources
+    map.addSource('peaks', {
         type: 'geojson',
         data: '/public/data/peaks.geojson'
+    });
+    map.addSource('caves', {
+        type: 'geojson',
+        data: '/public/data/caves.geojson'
     });
 
     // Trail layers — ordered bottom to top
@@ -323,75 +576,9 @@ function addDataLayers(config) {
         });
     }
 
-    // Peak markers — T1 (icon only, lower zooms)
-    if (map.hasImage('peak-s1')) {
-        map.addLayer({
-            id: 'rmm-peaks-t1',
-            type: 'symbol',
-            source: 'rmm-peaks',
-            minzoom: PEAK_STYLES.t1.minzoom,
-            maxzoom: PEAK_STYLES.t1.maxzoom,
-            layout: {
-                'icon-image': 'peak-s1',
-                'icon-size': [
-                    'interpolate', ['linear'], ['zoom'],
-                    8,  PEAK_STYLES.t1.iconSize.z8,
-                    11, PEAK_STYLES.t1.iconSize.z11,
-                    13, PEAK_STYLES.t1.iconSize.z13
-                ],
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': false,
-                'symbol-sort-key': [
-                    'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
-                ]
-            }
-        });
-    }
-
-    // Peak markers — T2 (icon + name + elevation, higher zooms)
-    if (map.hasImage('peak-s2')) {
-        map.addLayer({
-            id: 'rmm-peaks-t2',
-            type: 'symbol',
-            source: 'rmm-peaks',
-            minzoom: PEAK_STYLES.t2.minzoom,
-            layout: {
-                'icon-image': 'peak-s2',
-                'icon-size': [
-                    'interpolate', ['linear'], ['zoom'],
-                    13, PEAK_STYLES.t2.iconSize.z13,
-                    15, PEAK_STYLES.t2.iconSize.z15,
-                    18, PEAK_STYLES.t2.iconSize.z18
-                ],
-                'icon-allow-overlap': true,
-                'icon-ignore-placement': false,
-                'text-field': [
-                    'case',
-                    ['has', 'ele'],
-                    ['concat', ['get', 'name'], '\n', ['to-string', ['get', 'ele']], 'm'],
-                    ['get', 'name']
-                ],
-                'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
-                'text-size': [
-                    'interpolate', ['linear'], ['zoom'],
-                    13, PEAK_STYLES.t2.textSize.z13,
-                    16, PEAK_STYLES.t2.textSize.z16
-                ],
-                'text-offset': PEAK_STYLES.t2.textOffset,
-                'text-anchor': 'top',
-                'text-max-width': 8,
-                'text-optional': true,
-                'symbol-sort-key': [
-                    'case', ['has', 'ele'], ['-', ['get', 'ele']], 0
-                ]
-            },
-            paint: {
-                'text-color': PEAK_STYLES.textColor,
-                'text-halo-color': PEAK_STYLES.textHaloColor,
-                'text-halo-width': PEAK_STYLES.textHaloWidth
-            }
-        });
-    }
+    // Marker layers — peaks then caves
+    addPeakLayers();
+    addCaveLayers();
 }
 
 // --- Map initialisation ---
@@ -428,9 +615,9 @@ function initMap(containerId) {
                 map.resize();
             });
 
-            // Load handler — fog, data layers, style_config
+            // Load handler — fog, icons, data layers, style_config
             // Note: mapbox-dem source and terrain are defined in the Mapbox Studio style JSON
-            map.on('load', function() {
+            map.on('load', async function() {
                 // 1. Fog
                 map.setFog({
                     range: [2, 12],
@@ -441,31 +628,9 @@ function initMap(containerId) {
                     'star-intensity': 0.15
                 });
 
-                // 2. Load peak icons in parallel, then add all data layers
-                var iconsToLoad = [
-                    { id: 'peak-s1', url: '/public/icons/peaks/peak-generic-s1.png' },
-                    { id: 'peak-s2', url: '/public/icons/peaks/peak-generic-s2.png' }
-                ];
-                var iconsLoaded = 0;
-                var totalIcons = iconsToLoad.length;
-
-                function onIconAttemptComplete() {
-                    iconsLoaded++;
-                    if (iconsLoaded === totalIcons) {
-                        addDataLayers(config);
-                    }
-                }
-
-                iconsToLoad.forEach(function(icon) {
-                    map.loadImage(icon.url, function(error, image) {
-                        if (error) {
-                            console.warn('RMM: Failed to load icon ' + icon.id);
-                        } else {
-                            map.addImage(icon.id, image);
-                        }
-                        onIconAttemptComplete();
-                    });
-                });
+                // 2. Load all marker icons (SVG → canvas → ImageData), then add all data layers
+                await loadAllMarkerIcons();
+                addDataLayers(config);
 
                 // 3. Load style_config from Supabase (fails gracefully)
                 loadStyleConfig();
@@ -477,6 +642,108 @@ function initMap(containerId) {
         .catch(function() {
             showMapError(targetId);
         });
+}
+
+// --- Email Overlay ---
+
+function initEmailOverlay() {
+    // Suppress if already subscribed
+    if (localStorage.getItem('rmm_subscribed') === 'true') return;
+
+    var backdrop = document.createElement('div');
+    backdrop.className = 'rmm-overlay-backdrop';
+    backdrop.id = 'rmm-overlay';
+    backdrop.innerHTML = [
+        '<div class="rmm-overlay-card" role="dialog" aria-modal="true" aria-label="Stay in the loop">',
+        '    <p class="rmm-overlay-eyebrow">Early Access</p>',
+        '    <h2 class="rmm-overlay-headline">The Peninsula.<br>Every peak. Every trail.</h2>',
+        '    <p class="rmm-overlay-body">Get notified when new features drop — route grading, fitness scoring, race readiness. No spam. Unsubscribe any time.</p>',
+        '    <div class="rmm-overlay-field">',
+        '        <input type="text" id="overlay-name" placeholder="first name" autocomplete="given-name" aria-label="First name">',
+        '    </div>',
+        '    <div class="rmm-overlay-field">',
+        '        <input type="email" id="overlay-email" placeholder="email address" autocomplete="email" aria-label="Email address">',
+        '    </div>',
+        '    <div class="rmm-overlay-consent">',
+        '        <input type="checkbox" id="overlay-consent">',
+        '        <label for="overlay-consent">I agree to receive trail updates and news from Run Mad Maps. Read our <a href="/privacy" target="_blank">Privacy Policy</a>.</label>',
+        '    </div>',
+        '    <p class="rmm-overlay-error" id="overlay-error"></p>',
+        '    <button class="rmm-overlay-submit" id="overlay-submit">Join the List</button>',
+        '    <button class="rmm-overlay-dismiss" id="overlay-dismiss">No thanks, just the map</button>',
+        '</div>'
+    ].join('');
+
+    document.body.appendChild(backdrop);
+
+    document.getElementById('overlay-dismiss').addEventListener('click', dismissOverlay);
+    document.getElementById('overlay-submit').addEventListener('click', handleOverlaySubmit);
+
+    // Allow Escape key to dismiss
+    document.addEventListener('keydown', function onEsc(e) {
+        if (e.key === 'Escape') {
+            dismissOverlay();
+            document.removeEventListener('keydown', onEsc);
+        }
+    });
+}
+
+function dismissOverlay() {
+    var backdrop = document.getElementById('rmm-overlay');
+    if (backdrop) {
+        backdrop.classList.add('hidden');
+    }
+}
+
+function handleOverlaySubmit() {
+    var nameInput = document.getElementById('overlay-name');
+    var emailInput = document.getElementById('overlay-email');
+    var consentInput = document.getElementById('overlay-consent');
+    var errorEl = document.getElementById('overlay-error');
+    var submitBtn = document.getElementById('overlay-submit');
+
+    var name = nameInput ? nameInput.value.trim() : '';
+    var email = emailInput ? emailInput.value.trim() : '';
+    var consent = consentInput ? consentInput.checked : false;
+
+    errorEl.textContent = '';
+
+    if (!name) { errorEl.textContent = 'Please enter your first name.'; return; }
+    if (!email) { errorEl.textContent = 'Please enter your email.'; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errorEl.textContent = 'Invalid email format.'; return; }
+    if (!consent) { errorEl.textContent = 'Please tick the box to continue.'; return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Joining...';
+
+    fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email, source: 'map-overlay' })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data.success) {
+            localStorage.setItem('rmm_subscribed', 'true');
+            var card = document.querySelector('.rmm-overlay-card');
+            if (card) {
+                card.innerHTML = '<p class="rmm-overlay-success">You\'re in. Watch this space.</p>';
+            }
+            setTimeout(dismissOverlay, 2000);
+        } else if (data.error === 'Already subscribed.') {
+            localStorage.setItem('rmm_subscribed', 'true');
+            dismissOverlay();
+        } else {
+            errorEl.textContent = data.error || 'Something went wrong. Try again.';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Join the List';
+        }
+    })
+    .catch(function() {
+        errorEl.textContent = 'Network error. Try again.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Join the List';
+    });
 }
 
 // --- Public API ---
@@ -491,5 +758,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var container = document.getElementById('map-container');
     if (container) {
         window.RMMMap.init('map-container');
+        initEmailOverlay();
     }
 });

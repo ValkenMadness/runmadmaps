@@ -33,11 +33,24 @@ It must stay in sync with the RMM Master Document.
 - .gitignore excludes .env and node_modules at all times.
 - Pre-integration security checklist before any new API or payment.
 
-## Icon Naming Convention
+## Icon Naming Convention [LOCKED]
 
-[category]-[slug]-s[state].[ext]
+t[state]-[category]-[slug].svg
 
-Examples: peak-table-mountain-s1.png, peak-lions-head-s3.svg
+Examples:
+  t1-peak-generic.svg           — T1 generic peak marker
+  t2-cave-generic.svg           — T2 generic cave marker
+  t3-peak-maclears-beacon.svg   — T3 bespoke peak marker
+  t4-cave-boomslang-cave.svg    — T4 bespoke cave marker
+  t0-antenna-generic.svg        — Single design, all states
+
+Rules:
+  - State number first (t0–t4)
+  - SVG only. No PNGs. No @2x suffix.
+  - t0 = one design used at all zoom levels
+  - Slugs: lowercase, hyphen-separated
+  - Category matches GeoJSON feature type
+  - Directory: /public/icons/[category-plural]/
 
 ## Directory Structure
 
