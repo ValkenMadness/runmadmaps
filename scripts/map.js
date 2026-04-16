@@ -311,8 +311,8 @@ function addPeakLayers() {
             'text-optional': true
         },
         paint: {
-            'text-color': '#FFFFFF',
-            'text-halo-color': '#171A14',
+            'text-color': '#171A14',
+            'text-halo-color': '#F5ECD7',
             'text-halo-width': 2
         }
     });
@@ -334,8 +334,8 @@ function addPeakLayers() {
             'text-optional': true
         },
         paint: {
-            'text-color': '#FFFFFF',
-            'text-halo-color': '#171A14',
+            'text-color': '#171A14',
+            'text-halo-color': '#F5ECD7',
             'text-halo-width': 2
         },
         filter: ['==', ['get', 'name'], '']  // matches nothing — hidden until hover
@@ -389,8 +389,8 @@ function addCaveLayers() {
             'text-optional': true
         },
         paint: {
-            'text-color': '#FFFFFF',
-            'text-halo-color': '#171A14',
+            'text-color': '#171A14',
+            'text-halo-color': '#F5ECD7',
             'text-halo-width': 2
         }
     });
@@ -412,8 +412,8 @@ function addCaveLayers() {
             'text-optional': true
         },
         paint: {
-            'text-color': '#FFFFFF',
-            'text-halo-color': '#171A14',
+            'text-color': '#171A14',
+            'text-halo-color': '#F5ECD7',
             'text-halo-width': 2
         },
         filter: ['==', ['get', 'name'], '']  // matches nothing — hidden until hover
