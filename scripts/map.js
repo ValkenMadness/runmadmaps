@@ -500,9 +500,42 @@ function setupHoverInteractions() {
     });
 }
 
+// --- Pulse animation state ---
+var pulseAnimation = null;
+var pulseMarker = null;
+
+function startRoutePulse(coords) {
+    stopRoutePulse();
+    if (!coords || coords.length < 2) return;
+
+    var el = document.createElement('div');
+    el.className = 'rmm-pulse-dot';
+    pulseMarker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+        .setLngLat([coords[0][0], coords[0][1]])
+        .addTo(map);
+
+    var index = 0;
+    var total = coords.length;
+    var speed = Math.max(20, Math.floor(3000 / total));
+
+    function step() {
+        if (index >= total) { index = 0; }
+        var c = coords[index];
+        pulseMarker.setLngLat([c[0], c[1]]);
+        index++;
+        pulseAnimation = setTimeout(step, speed);
+    }
+    step();
+}
+
+function stopRoutePulse() {
+    if (pulseAnimation) { clearTimeout(pulseAnimation); pulseAnimation = null; }
+    if (pulseMarker) { pulseMarker.remove(); pulseMarker = null; }
+}
+
 // --- RMM graded route loader ---
 // Fetches individual GeoJSON files from RMM_ROUTES, merges into one FeatureCollection,
-// then adds a single source + line layer + label layer. One source/two layers regardless of route count.
+// then adds layers and wires all interactions. One source regardless of route count.
 async function loadRMMRoutes() {
     var features = [];
 
@@ -532,34 +565,74 @@ async function loadRMMRoutes() {
 
     console.log('RMM: Loaded ' + features.length + ' routes');
 
+    // Store full coordinate arrays keyed by name — used by pulse animation
+    // (querySourceFeatures returns tile-clipped coords; these are always complete)
+    var rmmRouteCoords = {};
+    features.forEach(function(f) {
+        if (f.properties && f.properties.name) {
+            rmmRouteCoords[f.properties.name] = f.geometry.coordinates;
+        }
+    });
+    window._rmmRouteCoords = rmmRouteCoords;
+
+    // Build start-point FeatureCollection from first coordinate of each route
+    var startFeatures = [];
+    features.forEach(function(f) {
+        var coords = f.geometry && f.geometry.coordinates;
+        if (!coords || coords.length === 0) return;
+        startFeatures.push({
+            type: 'Feature',
+            properties: Object.assign({}, f.properties),
+            geometry: { type: 'Point', coordinates: [coords[0][0], coords[0][1]] }
+        });
+    });
+
+    // Sources
     map.addSource('rmm-routes', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: features }
     });
+    map.addSource('rmm-route-starts', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: startFeatures }
+    });
 
+    // Layer 1 — base route lines (50% opacity by default)
     map.addLayer({
         id: 'rmm-routes',
         type: 'line',
         source: 'rmm-routes',
-        layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-        },
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
             'line-color': '#FF4E50',
             'line-width': [
                 'interpolate', ['linear'], ['zoom'],
-                8,  1.5,
-                10, 2,
-                12, 3,
-                14, 4,
-                16, 5
+                8, 1.5, 10, 2, 12, 3, 14, 4, 16, 5
             ],
-            'line-opacity': 0.85,
+            'line-opacity': 0.5,
             'line-emissive-strength': 0.5
         }
     });
 
+    // Layer 2 — highlight (full opacity, slightly wider — hidden until hover)
+    map.addLayer({
+        id: 'rmm-routes-highlight',
+        type: 'line',
+        source: 'rmm-routes',
+        layout: { 'line-join': 'round', 'line-cap': 'round' },
+        paint: {
+            'line-color': '#FF4E50',
+            'line-width': [
+                'interpolate', ['linear'], ['zoom'],
+                8, 2, 10, 2.5, 12, 3.5, 14, 5, 16, 6
+            ],
+            'line-opacity': 1.0,
+            'line-emissive-strength': 0.5
+        },
+        filter: ['==', ['get', 'name'], '']
+    });
+
+    // Layer 3 — route name labels (50% opacity by default)
     map.addLayer({
         id: 'rmm-route-labels',
         type: 'symbol',
@@ -570,9 +643,7 @@ async function loadRMMRoutes() {
             'text-field': ['get', 'name'],
             'text-size': [
                 'interpolate', ['linear'], ['zoom'],
-                12, 10,
-                14, 12,
-                16, 14
+                12, 10, 14, 12, 16, 14
             ],
             'text-font': ['Space Mono Regular', 'DIN Pro Regular', 'Arial Unicode MS Regular'],
             'text-anchor': 'center',
@@ -583,8 +654,97 @@ async function loadRMMRoutes() {
         paint: {
             'text-color': '#FF4E50',
             'text-halo-color': '#171A14',
-            'text-halo-width': 2
+            'text-halo-width': 2,
+            'text-opacity': 0.5
         }
+    });
+
+    // Layer 4 — start-point dots (above route lines, below markers)
+    map.addLayer({
+        id: 'rmm-route-starts',
+        type: 'circle',
+        source: 'rmm-route-starts',
+        paint: {
+            'circle-radius': [
+                'interpolate', ['linear'], ['zoom'],
+                8, 3, 12, 5, 15, 7
+            ],
+            'circle-color': '#FF4E50',
+            'circle-opacity': 0.7,
+            'circle-stroke-color': '#FFFFFF',
+            'circle-stroke-width': 2,
+            'circle-stroke-opacity': 0.9
+        }
+    });
+
+    // Popup — created once, reused for each hover
+    var routePopup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        className: 'rmm-route-popup',
+        maxWidth: '280px',
+        offset: 15
+    });
+
+    // Helper — show highlight + label for a named route
+    function highlightRoute(name) {
+        map.setFilter('rmm-routes-highlight', ['==', ['get', 'name'], name]);
+        map.setPaintProperty('rmm-route-labels', 'text-opacity',
+            ['case', ['==', ['get', 'name'], name], 1.0, 0.5]
+        );
+    }
+
+    // Helper — clear highlight + label back to defaults
+    function clearHighlight() {
+        map.setFilter('rmm-routes-highlight', ['==', ['get', 'name'], '']);
+        map.setPaintProperty('rmm-route-labels', 'text-opacity', 0.5);
+    }
+
+    // Line hover — opacity + pulse (no popup)
+    map.on('mouseenter', 'rmm-routes', function(e) {
+        if (!e.features || !e.features.length) return;
+        var name = e.features[0].properties.name;
+        map.getCanvas().style.cursor = 'pointer';
+        highlightRoute(name);
+        var coords = window._rmmRouteCoords[name];
+        if (coords) startRoutePulse(coords);
+    });
+
+    map.on('mouseleave', 'rmm-routes', function() {
+        map.getCanvas().style.cursor = '';
+        clearHighlight();
+        stopRoutePulse();
+    });
+
+    // Start-dot hover — popup + opacity + pulse
+    map.on('mouseenter', 'rmm-route-starts', function(e) {
+        if (!e.features || !e.features.length) return;
+        map.getCanvas().style.cursor = 'pointer';
+        var props = e.features[0].properties;
+        var lngLat = e.features[0].geometry.coordinates.slice();
+
+        var html = '<div class="rmm-route-card">' +
+            '<div class="rmm-route-card-grade">' + (props.grade_display || '') + '</div>' +
+            '<div class="rmm-route-card-name">' + (props.name || '') + '</div>' +
+            '<div class="rmm-route-card-stats">' +
+                '<span>' + (props.distance_km || '') + ' km</span>' +
+                '<span>' + (props.elevation_gain_m || '') + 'm gain</span>' +
+                '<span>' + (props.elevation_density || '') + ' m/km</span>' +
+            '</div>' +
+            '<div class="rmm-route-card-action">Route details coming soon</div>' +
+            '</div>';
+
+        routePopup.setLngLat(lngLat).setHTML(html).addTo(map);
+        highlightRoute(props.name);
+        var coords = window._rmmRouteCoords[props.name];
+        if (coords) startRoutePulse(coords);
+    });
+
+    map.on('mouseleave', 'rmm-route-starts', function() {
+        map.getCanvas().style.cursor = '';
+        routePopup.remove();
+        clearHighlight();
+        stopRoutePulse();
     });
 }
 

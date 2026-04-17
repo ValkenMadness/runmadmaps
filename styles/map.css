@@ -251,6 +251,71 @@
     }
 }
 
+/* ============================================
+   Route Info Popup
+   ============================================ */
+
+.rmm-route-popup .mapboxgl-popup-content {
+    background: #171A14;
+    border: 1px solid rgba(255, 78, 80, 0.3);
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.rmm-route-popup .mapboxgl-popup-tip {
+    border-top-color: #171A14;
+}
+
+.rmm-route-card-grade {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #FF4E50;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.rmm-route-card-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+}
+
+.rmm-route-card-stats {
+    display: flex;
+    gap: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: #F5ECD7;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(245, 236, 215, 0.15);
+    flex-wrap: wrap;
+}
+
+.rmm-route-card-action {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgba(245, 236, 215, 0.4);
+    text-align: center;
+}
+
+/* ============================================
+   Route Pulse Animation Dot
+   ============================================ */
+
+.rmm-pulse-dot {
+    width: 10px;
+    height: 10px;
+    background: #FF4E50;
+    border-radius: 50%;
+    box-shadow: 0 0 12px 4px rgba(255, 78, 80, 0.6),
+                0 0 24px 8px rgba(255, 78, 80, 0.3);
+    pointer-events: none;
+}
+
 /* --- Mobile --- */
 @media (max-width: 768px) {
     #map-container {
