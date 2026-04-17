@@ -297,12 +297,12 @@ function addPeakLayers() {
             ],
             'icon-size': [
                 'interpolate', ['linear'], ['zoom'],
-                8,  0.5,
-                10, 0.6,
-                12, 0.7,
-                13, 0.6,
-                15, 0.7,
-                18, 0.5
+                8,  0.55,
+                10, 0.66,
+                12, 0.77,
+                13, 0.66,
+                15, 0.77,
+                18, 0.55
             ],
             'icon-allow-overlap': [
                 'step', ['zoom'],
@@ -338,7 +338,7 @@ function addPeakLayers() {
         source: cat.source,
         layout: {
             'icon-image': buildBespokeMatchExpr('peaks'),
-            'icon-size': 1.0,
+            'icon-size': 1.1,
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-offset': [0, 1.8],
@@ -375,12 +375,12 @@ function addCaveLayers() {
             ],
             'icon-size': [
                 'interpolate', ['linear'], ['zoom'],
-                8,  0.5,
-                10, 0.6,
-                12, 0.7,
-                13, 0.6,
-                15, 0.7,
-                18, 0.5
+                8,  0.375,
+                10, 0.45,
+                12, 0.525,
+                13, 0.45,
+                15, 0.525,
+                18, 0.375
             ],
             'icon-allow-overlap': [
                 'step', ['zoom'],
@@ -416,7 +416,7 @@ function addCaveLayers() {
         source: cat.source,
         layout: {
             'icon-image': buildBespokeMatchExpr('caves'),
-            'icon-size': 1.0,
+            'icon-size': 0.75,
             'icon-allow-overlap': true,
             'text-field': ['get', 'name'],
             'text-offset': [0, 1.8],
