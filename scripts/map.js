@@ -101,6 +101,20 @@ var MARKER_STYLES = {
     }
 };
 
+// RMM Graded Routes — individual files, combined at runtime into one source
+// To add a route: place the GeoJSON in /public/data/routes/ and add the path here.
+// To remove a route: delete the file and remove the path from this array.
+var RMM_ROUTES = [
+    '/public/data/routes/Elsies-Peak-Route-1.geojson',
+    '/public/data/routes/Elsies-Peak-Route-2.geojson',
+    '/public/data/routes/Elsies-Peak-Route-3.geojson',
+    '/public/data/routes/Silvermine-Lower-Route-1.geojson',
+    '/public/data/routes/Silvermine-Lower-Route-2.geojson',
+    '/public/data/routes/Silvermine-Lower-Route-3.geojson',
+    '/public/data/routes/Silvermine-Lower-Route-4.geojson',
+    '/public/data/routes/Silvermine-Lower-Route-5.geojson',
+];
+
 var map = null;
 
 // --- Error state ---
@@ -486,8 +500,96 @@ function setupHoverInteractions() {
     });
 }
 
+// --- RMM graded route loader ---
+// Fetches individual GeoJSON files from RMM_ROUTES, merges into one FeatureCollection,
+// then adds a single source + line layer + label layer. One source/two layers regardless of route count.
+async function loadRMMRoutes() {
+    var features = [];
+
+    for (var i = 0; i < RMM_ROUTES.length; i++) {
+        var url = RMM_ROUTES[i];
+        try {
+            var response = await fetch(url);
+            if (!response.ok) {
+                console.error('Failed to load route: ' + url + ' (' + response.status + ')');
+                continue;
+            }
+            var data = await response.json();
+            if (data.type === 'FeatureCollection' && data.features) {
+                features = features.concat(data.features);
+            } else if (data.type === 'Feature') {
+                features.push(data);
+            }
+        } catch (e) {
+            console.error('Error loading route ' + url + ':', e);
+        }
+    }
+
+    if (features.length === 0) {
+        console.warn('RMM: No routes loaded');
+        return;
+    }
+
+    console.log('RMM: Loaded ' + features.length + ' routes');
+
+    map.addSource('rmm-routes', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: features }
+    });
+
+    map.addLayer({
+        id: 'rmm-routes',
+        type: 'line',
+        source: 'rmm-routes',
+        layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+        },
+        paint: {
+            'line-color': '#FF4E50',
+            'line-width': [
+                'interpolate', ['linear'], ['zoom'],
+                8,  1.5,
+                10, 2,
+                12, 3,
+                14, 4,
+                16, 5
+            ],
+            'line-opacity': 0.85,
+            'line-emissive-strength': 0.5
+        }
+    });
+
+    map.addLayer({
+        id: 'rmm-route-labels',
+        type: 'symbol',
+        source: 'rmm-routes',
+        minzoom: 12,
+        layout: {
+            'symbol-placement': 'line-center',
+            'text-field': ['get', 'name'],
+            'text-size': [
+                'interpolate', ['linear'], ['zoom'],
+                12, 10,
+                14, 12,
+                16, 14
+            ],
+            'text-font': ['Space Mono Regular', 'DIN Pro Regular', 'Arial Unicode MS Regular'],
+            'text-anchor': 'center',
+            'text-offset': [0, -1],
+            'text-allow-overlap': false,
+            'text-optional': true
+        },
+        paint: {
+            'text-color': '#FF4E50',
+            'text-halo-color': '#171A14',
+            'text-halo-width': 2
+        }
+    });
+}
+
 // --- Data layers (Stage 2) ---
-function addDataLayers(config) {
+async function addDataLayers(config) {
     // Contour source
     if (config.contoursTilesetId) {
         map.addSource('rmm-contours', {
@@ -655,7 +757,10 @@ function addDataLayers(config) {
         });
     }
 
-    // Marker layers — peaks then caves
+    // RMM graded route lines — above trails, below markers
+    await loadRMMRoutes();
+
+    // Marker layers — peaks then caves (render above routes)
     addPeakLayers();
     addCaveLayers();
     setupHoverInteractions();
@@ -710,7 +815,7 @@ function initMap(containerId) {
 
                 // 2. Load all marker icons (SVG → canvas → ImageData), then add all data layers
                 await loadAllMarkerIcons();
-                addDataLayers(config);
+                await addDataLayers(config);
 
                 // 3. Load style_config from Supabase (fails gracefully)
                 loadStyleConfig();
