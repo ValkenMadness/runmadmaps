@@ -565,12 +565,33 @@ async function loadRMMRoutes() {
 
     console.log('RMM: Loaded ' + features.length + ' routes');
 
+    // Helpers — normalise LineString and MultiLineString into a single flat
+    // [[lng,lat,...], ...] array, and pull out the first [lng,lat] of a route.
+    function flattenLineCoords(geom) {
+        if (!geom || !geom.coordinates) return null;
+        if (geom.type === 'LineString') {
+            return geom.coordinates;
+        }
+        if (geom.type === 'MultiLineString') {
+            return [].concat.apply([], geom.coordinates);
+        }
+        return null;
+    }
+    function getFirstPoint(geom) {
+        var flat = flattenLineCoords(geom);
+        if (!flat || flat.length === 0) return null;
+        var p = flat[0];
+        if (!p || p.length < 2) return null;
+        return [p[0], p[1]];
+    }
+
     // Store full coordinate arrays keyed by name — used by pulse animation
     // (querySourceFeatures returns tile-clipped coords; these are always complete)
     var rmmRouteCoords = {};
     features.forEach(function(f) {
         if (f.properties && f.properties.name) {
-            rmmRouteCoords[f.properties.name] = f.geometry.coordinates;
+            var flat = flattenLineCoords(f.geometry);
+            if (flat) rmmRouteCoords[f.properties.name] = flat;
         }
     });
     window._rmmRouteCoords = rmmRouteCoords;
@@ -578,12 +599,12 @@ async function loadRMMRoutes() {
     // Build start-point features from first coordinate of each route
     var startFeatures = [];
     features.forEach(function(f) {
-        var coords = f.geometry && f.geometry.coordinates;
-        if (!coords || coords.length === 0) return;
+        var first = getFirstPoint(f.geometry);
+        if (!first) return;
         startFeatures.push({
             type: 'Feature',
             properties: Object.assign({}, f.properties),
-            geometry: { type: 'Point', coordinates: [coords[0][0], coords[0][1]] }
+            geometry: { type: 'Point', coordinates: first }
         });
     });
 
@@ -1008,8 +1029,13 @@ async function addDataLayers(config) {
         });
     }
 
-    // RMM graded route lines — above trails, below markers
-    await loadRMMRoutes();
+    // RMM graded route lines — above trails, below markers.
+    // Wrapped so a route-loading failure can't block peak/cave layers from rendering.
+    try {
+        await loadRMMRoutes();
+    } catch (e) {
+        console.error('RMM: loadRMMRoutes failed —', e);
+    }
 
     // Marker layers — peaks then caves (render above routes)
     addPeakLayers();
