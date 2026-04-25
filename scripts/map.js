@@ -575,7 +575,7 @@ async function loadRMMRoutes() {
     });
     window._rmmRouteCoords = rmmRouteCoords;
 
-    // Build start-point FeatureCollection from first coordinate of each route
+    // Build start-point features from first coordinate of each route
     var startFeatures = [];
     features.forEach(function(f) {
         var coords = f.geometry && f.geometry.coordinates;
@@ -587,14 +587,36 @@ async function loadRMMRoutes() {
         });
     });
 
+    // Group by rounded start coordinate (5 dp ≈ 1m precision).
+    // Singles go on the GL layer; clusters become mapboxgl.Marker instances.
+    var coordGroups = {};
+    startFeatures.forEach(function(f) {
+        var c = f.geometry.coordinates;
+        var key = Math.round(c[0] * 1e5) / 1e5 + ',' + Math.round(c[1] * 1e5) / 1e5;
+        if (!coordGroups[key]) coordGroups[key] = [];
+        coordGroups[key].push(f);
+    });
+
+    var singleFeatures = [];
+    var clusterGroups = [];
+    Object.keys(coordGroups).forEach(function(key) {
+        var group = coordGroups[key];
+        if (group.length === 1) {
+            singleFeatures.push(group[0]);
+        } else {
+            clusterGroups.push({ lngLat: group[0].geometry.coordinates, trails: group });
+        }
+    });
+
     // Sources
     map.addSource('rmm-routes', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: features }
     });
+    // rmm-route-starts only contains single-trail starts; cluster primaries are added below as Markers
     map.addSource('rmm-route-starts', {
         type: 'geojson',
-        data: { type: 'FeatureCollection', features: startFeatures }
+        data: { type: 'FeatureCollection', features: singleFeatures }
     });
 
     // Layer 1 — base route lines (hidden by default; revealed via rmm-routes-highlight on marker hover)
@@ -659,7 +681,8 @@ async function loadRMMRoutes() {
         }
     });
 
-    // Layer 4 — start-point dots (above route lines, below markers)
+    // Layer 4 — single-trail start dots (above route lines, below markers)
+    // Trails that share a start coordinate are handled as cluster Markers below.
     map.addLayer({
         id: 'rmm-route-starts',
         type: 'circle',
@@ -699,6 +722,90 @@ async function loadRMMRoutes() {
         map.setFilter('rmm-routes-highlight', ['==', ['get', 'name'], '']);
         map.setPaintProperty('rmm-route-labels', 'text-opacity', 0);
     }
+
+    // --- Cluster interaction ---
+    // State shared across all cluster markers within this loadRMMRoutes call.
+    var clusterCollapseTimer = null;
+    var clusterSecondaries = [];
+
+    function collapseCluster() {
+        clusterCollapseTimer = null;
+        clusterSecondaries.forEach(function(m) { m.remove(); });
+        clusterSecondaries = [];
+        clearHighlight();
+    }
+
+    function scheduleCollapse() {
+        clusterCollapseTimer = setTimeout(collapseCluster, 150);
+    }
+
+    function cancelCollapse() {
+        if (clusterCollapseTimer) {
+            clearTimeout(clusterCollapseTimer);
+            clusterCollapseTimer = null;
+        }
+    }
+
+    // Radiate secondary markers around a cluster primary at the given lngLat.
+    // Secondaries are positioned using a pixel-space radius so spacing is zoom-stable.
+    function expandCluster(lngLat, trails) {
+        cancelCollapse();
+        clusterSecondaries.forEach(function(m) { m.remove(); });
+        clusterSecondaries = [];
+        clearHighlight();
+
+        var n = trails.length;
+        var radius = 52; // px from primary centre
+        var center = map.project(lngLat);
+
+        trails.forEach(function(trail, i) {
+            var angle = (i / n) * 2 * Math.PI - Math.PI / 2; // start top, clockwise
+            var point = map.unproject([
+                center.x + radius * Math.cos(angle),
+                center.y + radius * Math.sin(angle)
+            ]);
+
+            var el = document.createElement('div');
+            el.className = 'rmm-cluster-secondary';
+
+            var marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+                .setLngLat([point.lng, point.lat])
+                .addTo(map);
+
+            el.addEventListener('mouseenter', function() {
+                cancelCollapse();
+                highlightRoute(trail.properties.name);
+            });
+
+            el.addEventListener('mouseleave', function() {
+                clearHighlight();
+                scheduleCollapse();
+            });
+
+            clusterSecondaries.push(marker);
+        });
+    }
+
+    // Create one primary Marker per cluster group.
+    // Marker rendering (the el + className) is intentionally separate from the
+    // hover/reveal logic so the circle can be swapped for custom artwork later.
+    clusterGroups.forEach(function(group) {
+        var el = document.createElement('div');
+        el.className = 'rmm-cluster-primary';
+
+        new mapboxgl.Marker({ element: el, anchor: 'center' })
+            .setLngLat(group.lngLat)
+            .addTo(map);
+
+        el.addEventListener('mouseenter', function() {
+            cancelCollapse();
+            expandCluster(group.lngLat, group.trails);
+        });
+
+        el.addEventListener('mouseleave', function() {
+            scheduleCollapse();
+        });
+    });
 
     // Start-dot hover — popup + reveal line + pulse
     map.on('mouseenter', 'rmm-route-starts', function(e) {

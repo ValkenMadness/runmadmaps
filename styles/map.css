@@ -316,6 +316,32 @@
     pointer-events: none;
 }
 
+/* ============================================
+   Cluster Start Markers
+   ============================================ */
+
+/* Primary — sits at the shared start coord; hover expands secondaries */
+.rmm-cluster-primary {
+    width: 14px;
+    height: 14px;
+    background: #FF4E50;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    opacity: 0.9;
+    cursor: pointer;
+}
+
+/* Secondary — radiated around the primary on hover, one per trail */
+.rmm-cluster-secondary {
+    width: 10px;
+    height: 10px;
+    background: #FF4E50;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    opacity: 0.7;
+    cursor: pointer;
+}
+
 /* --- Mobile --- */
 @media (max-width: 768px) {
     #map-container {
