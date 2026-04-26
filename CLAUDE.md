@@ -3,6 +3,14 @@
 This file is the in-repo technical reference for any AI or developer working on this codebase.
 It must stay in sync with the RMM Master Document.
 
+## Branching
+
+- `dev` is the working branch. All work happens here.
+- `main` is production. Only updated via squash merge from dev.
+- Never push directly to main.
+- Every push to `dev` generates a Vercel preview URL for testing.
+- Releases go through GitHub PR: dev → main, squash merge.
+
 ## Tech Stack
 
 - Frontend: Vanilla JavaScript, HTML, CSS. NOT React.
