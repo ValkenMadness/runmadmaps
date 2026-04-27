@@ -500,6 +500,61 @@ function setupHoverInteractions() {
     });
 }
 
+// --- Popup anchor helper ---
+// Given a route start lngLat and the full route coordinate array, determines
+// which Mapbox GL Popup anchor to use so the popup body appears on the
+// opposite side of the marker from the trail. This prevents the popup from
+// overlapping the pulse animation running along the route.
+function getPopupAnchorAwayFromTrail(startLngLat, coords) {
+    if (!coords || coords.length < 2 || !map) return 'bottom'; // safe default
+
+    // Sample a point ~10 coords ahead to get a stable direction vector.
+    // Using too few coords can give a misleading angle on switchbacks.
+    var sampleIdx = Math.min(10, coords.length - 1);
+    var startPx = map.project(startLngLat);
+    var aheadPx = map.project([coords[sampleIdx][0], coords[sampleIdx][1]]);
+
+    // Direction the trail heads in screen space (px)
+    var dx = aheadPx.x - startPx.x;
+    var dy = aheadPx.y - startPx.y;
+
+    // Angle in degrees, 0 = right, 90 = down (screen coords)
+    var angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+    // Normalise to 0–360
+    if (angle < 0) angle += 360;
+
+    // The anchor names describe where the popup's *tip* attaches to the point.
+    // We want the tip on the trail side so the popup body extends away from it.
+    //
+    //   Trail heads →  right (315-45°)     → anchor 'left'   (tip on left, body extends right... wait)
+    //
+    // Actually: anchor = where the popup connects to the point.
+    //   anchor 'left'  → left edge at point → popup body extends RIGHT
+    //   anchor 'right' → right edge at point → popup body extends LEFT
+    //   anchor 'top'   → top at point → popup extends DOWN
+    //   anchor 'bottom'→ bottom at point → popup extends UP
+    //
+    // If trail goes RIGHT, we want popup to extend LEFT → anchor 'right'
+    // If trail goes LEFT, we want popup to extend RIGHT → anchor 'left'
+    // If trail goes DOWN, we want popup to extend UP → anchor 'bottom'
+    // If trail goes UP, we want popup to extend DOWN → anchor 'top'
+
+    if (angle >= 315 || angle < 45) {
+        // Trail heads right → popup extends left
+        return 'right';
+    } else if (angle >= 45 && angle < 135) {
+        // Trail heads down → popup extends up
+        return 'bottom';
+    } else if (angle >= 135 && angle < 225) {
+        // Trail heads left → popup extends right
+        return 'left';
+    } else {
+        // Trail heads up → popup extends down
+        return 'top';
+    }
+}
+
 // --- Pulse animation state ---
 var pulseAnimation = null;
 var pulseMarker = null;
@@ -549,6 +604,26 @@ async function loadRMMRoutes() {
             }
             var data = await response.json();
             if (data.type === 'FeatureCollection' && data.features) {
+                // Merge route metadata from crs.properties into each feature's properties.
+                // QGIS exports store grade, distance, elevation etc. on the FeatureCollection root
+                // rather than on individual features. The popup reads feature.properties, so we
+                // push the metadata down so it's available at render time.
+                var routeMeta = (data.crs && data.crs.properties) ? data.crs.properties : {};
+                data.features.forEach(function(f) {
+                    if (routeMeta && f.properties) {
+                        // Store the clean display name from crs (e.g. "Elsies Peak - Route 1")
+                        // separately so it doesn't clash with the feature's layer-matching name
+                        if (routeMeta.name) {
+                            f.properties.display_name = routeMeta.name;
+                        }
+                        // Copy route-level fields without overwriting existing feature fields
+                        Object.keys(routeMeta).forEach(function(key) {
+                            if (f.properties[key] === undefined || f.properties[key] === null) {
+                                f.properties[key] = routeMeta[key];
+                            }
+                        });
+                    }
+                });
                 features = features.concat(data.features);
             } else if (data.type === 'Feature') {
                 features.push(data);
@@ -835,9 +910,10 @@ async function loadRMMRoutes() {
         var props = e.features[0].properties;
         var lngLat = e.features[0].geometry.coordinates.slice();
 
+        var routeName = props.display_name || props.name || '';
         var html = '<div class="rmm-route-card">' +
             '<div class="rmm-route-card-grade">' + (props.grade_display || '') + '</div>' +
-            '<div class="rmm-route-card-name">' + (props.name || '') + '</div>' +
+            '<div class="rmm-route-card-name">' + routeName + '</div>' +
             '<div class="rmm-route-card-stats">' +
                 '<span>' + (props.distance_km || '') + ' km</span>' +
                 '<span>' + (props.elevation_gain_m || '') + 'm gain</span>' +
@@ -846,9 +922,14 @@ async function loadRMMRoutes() {
             '<div class="rmm-route-card-action">Route details coming soon</div>' +
             '</div>';
 
+        // Position popup opposite to the trail direction so it doesn't
+        // overlap the pulse animation running along the route.
+        var coords = window._rmmRouteCoords[props.name];
+        var popupAnchor = getPopupAnchorAwayFromTrail(lngLat, coords);
+        routePopup.options.anchor = popupAnchor;
+
         routePopup.setLngLat(lngLat).setHTML(html).addTo(map);
         highlightRoute(props.name);
-        var coords = window._rmmRouteCoords[props.name];
         if (coords) startRoutePulse(coords);
     });
 
