@@ -1,2 +1,0 @@
-# Python stdlib only — no external dependencies.
-# Vercel bundles the stdlib automatically.
