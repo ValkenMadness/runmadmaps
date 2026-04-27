@@ -1,0 +1,102 @@
+# ============================================
+# RMM Route Analyzer — Vercel Environment Variables
+# ============================================
+#
+# HOW TO USE:
+# 1. Fill in your values from Formula Lab .env
+# 2. In Vercel: Project Settings → Environment Variables
+# 3. Scroll down and click the ".env" tab (bulk editor)
+# 4. Paste this entire block (Vercel ignores # comments)
+# 5. Select all 3 environments: Production, Preview, Development
+# 6. Click Save
+# 7. Redeploy
+#
+# ============================================
+
+# --- Distance Bands ---
+GRADE_DISTANCE_SHORT_MAX=
+GRADE_DISTANCE_MEDIUM_MAX=
+GRADE_DISTANCE_LONG_MAX=
+
+# --- Elevation Density Bands ---
+ED_BAND_LOW_MAX=
+ED_BAND_ROLLING_MAX=
+ED_BAND_HILLY_MAX=
+ED_BAND_STEEP_MAX=
+ED_BAND_MOUNTAIN_MAX=
+
+# --- Base Class Matrix (single-line JSON) ---
+BASE_CLASS_MATRIX=
+
+# --- Grade Modifiers ---
+TBS_MODIFIER_TIER1_THRESHOLD=
+TBS_MODIFIER_TIER2_THRESHOLD=
+GAIN_MODIFIER_TIER1_GAIN=
+GAIN_MODIFIER_TIER1_DIST=
+GAIN_MODIFIER_TIER2_GAIN=
+GAIN_MODIFIER_TIER2_DIST=
+MODIFIER_MAX=
+
+# --- Terrain Difficulty Score ---
+TDS_DIVISOR=
+TDS_MIN=
+TDS_MAX=
+TDS_GAIN_FLOOR_TIER1_GAIN=
+TDS_GAIN_FLOOR_TIER1_DIST=
+TDS_GAIN_FLOOR_TIER1_SCORE=
+TDS_GAIN_FLOOR_TIER2_GAIN=
+TDS_GAIN_FLOOR_TIER2_DIST=
+TDS_GAIN_FLOOR_TIER2_SCORE=
+
+# --- Effort Descriptor ---
+EFFORT_FLAT_ED_MAX=
+EFFORT_UNDULATING_ED_MAX=
+EFFORT_HILLY_ED_MAX=
+EFFORT_STEADY_RISE_ED_MAX=
+EFFORT_STEADY_RISE_MSG_MAX=
+EFFORT_SUSTAINED_ED_MAX=
+EFFORT_SUSTAINED_MSG_MIN=
+EFFORT_SUSTAINED_MSG_MAX=
+EFFORT_BIG_PUSH_ED_MIN=
+EFFORT_RELENTLESS_ED_MIN=
+EFFORT_RELENTLESS_MSG_MIN=
+EFFORT_RELENTLESS_TERRAIN_CC_MIN=
+
+# --- Climb Detection ---
+CLIMB_MIN_GAIN_M=
+CLIMB_END_DESCENT_M=
+
+# --- Pillar 3: Climb Structure ---
+PILLAR3_SINGLE_CLIMB_PCT=
+PILLAR3_STACKED_HALF_PCT=
+PILLAR3_EVEN_MAX_CLIMB_PCT=
+PILLAR3_EVEN_MAX_GRADIENT=
+PILLAR3_TECHNICAL_MIN_CLIMBS=
+PILLAR3_TECHNICAL_DESCENT_RATIO=
+
+# --- Terrain Brutality Score Weights ---
+TBS_WEIGHT_ELEV_DENSITY=
+TBS_WEIGHT_MAX_GRADIENT=
+TBS_WEIGHT_GRADIENT_VARIABILITY=
+
+# --- Route Complexity Score Weights ---
+RCS_WEIGHT_CLIMB_COUNT=
+RCS_WEIGHT_EFFORT_INDEX=
+RCS_WEIGHT_SPLIT_DEVIATION=
+
+# --- Gradient Analysis ---
+GRADIENT_SEGMENT_LENGTH_M=
+MAX_GRADIENT_WINDOW_M=
+
+# --- Moving Time Thresholds ---
+MOVING_THRESHOLD_ROAD=
+MOVING_THRESHOLD_TRAIL=
+MOVING_THRESHOLD_HIKE=
+
+# --- DEM ---
+DEM_SMOOTHING_THRESHOLD_M=
+
+# --- Pace Consistency ---
+PACE_CONSISTENCY_TRIM_PCT=
+PACE_CONSISTENCY_MIN_SPLITS_FULL=
+PACE_CONSISTENCY_MIN_SPLITS_PARTIAL=

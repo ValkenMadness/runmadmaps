@@ -1877,3 +1877,328 @@
         -webkit-overflow-scrolling: touch;
     }
 }
+
+
+/* ============================================
+   ROUTE ANALYZER — UPLOAD TOOL
+   ============================================ */
+
+.section-upload {
+    background: rgba(23, 26, 20, 0.04);
+}
+
+.upload-container {
+    max-width: 960px;
+    margin: 1rem auto;
+    padding: 0 1.5rem;
+}
+
+/* Upload Area */
+.upload-area {
+    border: 2px dashed rgba(23, 26, 20, 0.25);
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.6);
+    transition: all 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.upload-area:hover {
+    border-color: var(--color-accent);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.upload-area.dragover {
+    border-color: var(--color-accent);
+    background: rgba(255, 69, 80, 0.05);
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.upload-text {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin: 0;
+}
+
+.upload-subtext {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin: 0;
+}
+
+/* Activity Type Selector */
+.activity-type-selector {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(23, 26, 20, 0.08);
+}
+
+.activity-type-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    white-space: nowrap;
+}
+
+.activity-type-options {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+}
+
+.activity-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-dark);
+    cursor: pointer;
+}
+
+.activity-option input[type="radio"] {
+    cursor: pointer;
+    accent-color: var(--color-accent);
+}
+
+/* Submit Button */
+.upload-button {
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--color-dark);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.upload-button:hover:not(:disabled) {
+    background: var(--color-accent);
+}
+
+.upload-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.upload-button-secondary {
+    background: transparent;
+    border: 1px solid var(--color-dark);
+    color: var(--color-dark);
+}
+
+.upload-button-secondary:hover {
+    background: var(--color-dark);
+    color: var(--color-white);
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(23, 26, 20, 0.08);
+    margin-bottom: 1.5rem;
+}
+
+.loading-text {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-dark);
+    margin: 0;
+}
+
+/* Error Display */
+.error-display {
+    padding: 1rem 1.5rem;
+    background: rgba(200, 85, 61, 0.08);
+    border: 1px solid rgba(200, 85, 61, 0.3);
+    border-left: 3px solid #C8553D;
+    margin-bottom: 1.5rem;
+}
+
+.error-text {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: #C8553D;
+    margin: 0;
+}
+
+/* Result Area */
+.result-area {
+    margin-bottom: 1.5rem;
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(23, 26, 20, 0.12);
+    padding: 2rem;
+}
+
+.result-grade-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(23, 26, 20, 0.08);
+}
+
+.result-grade-letter {
+    font-family: var(--font-mono);
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.result-grade-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.result-tds {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+.result-tds-label {
+    font-size: 0.85rem;
+    font-weight: 400;
+}
+
+.result-effort {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+/* Stats Grid */
+.result-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.result-stat {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: rgba(23, 26, 20, 0.03);
+    border: 1px solid rgba(23, 26, 20, 0.08);
+}
+
+.result-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.result-stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-dark);
+}
+
+/* Elevation Profile */
+.result-profile-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(23, 26, 20, 0.08);
+}
+
+.result-profile-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 0 0 1rem 0;
+}
+
+.elevation-profile-svg {
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    background: rgba(23, 26, 20, 0.03);
+    border: 1px solid rgba(23, 26, 20, 0.08);
+}
+
+/* Upload Tool Responsive */
+@media (max-width: 768px) {
+    .upload-area {
+        padding: 2rem 1rem;
+    }
+
+    .activity-type-selector {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .activity-type-options {
+        width: 100%;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .result-grade-section {
+        gap: 1rem;
+    }
+
+    .result-grade-letter {
+        font-size: 3rem;
+    }
+
+    .result-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-card {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .result-grade-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .upload-container {
+        padding: 0 1rem;
+    }
+
+    .upload-button {
+        padding: 0.75rem 1rem;
+        font-size: 0.7rem;
+    }
+}

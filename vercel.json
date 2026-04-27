@@ -1,6 +1,10 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/pages/map.html" },
+    { "source": "/api/python/calculate-rps", "destination": "/api/python/calculate_rps" },
+    { "source": "/api/python/race-readiness", "destination": "/api/python/race_readiness_check" },
+    { "source": "/api/python/recalculate-decay", "destination": "/api/python/recalculate_decay" },
+    { "source": "/api/python/analyze", "destination": "/api/python/analyze" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/map", "destination": "/pages/map.html" },
     { "source": "/about", "destination": "/pages/about.html" },

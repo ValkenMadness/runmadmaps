@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Read(//c/Users/user/.claude/projects/e--14---RMM-Official-02---The-Website-Build-03---THE-OFFICIAL-BUILD/memory/**)"
+      "Read(//c/Users/user/.claude/projects/e--14---RMM-Official-02---The-Website-Build-03---THE-OFFICIAL-BUILD/memory/**)",
+      "mcp__claude_ai_Google_Drive__search_files",
+      "Read(//e/14 - RMM Official/**)",
+      "Read(//e/13 - RMM Fitnes and Route Tracker TESTING/backend/**)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

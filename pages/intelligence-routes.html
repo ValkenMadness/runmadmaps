@@ -146,15 +146,117 @@
                 </div>
             </div>
 
-            <!-- Section 4: CTA -->
-            <div class="section section-cta">
+            <!-- Section 4: Upload Tool -->
+            <div class="section section-upload">
+                <p class="section-label">Try It Now</p>
                 <h2 class="section-heading">Upload a GPX and see the grade</h2>
-                <p class="section-body">Drop any GPX file and get an objective, GPS-derived grade in seconds.</p>
-                <span class="coming-soon-badge">Coming Soon</span>
+                <div class="upload-container">
+                    <!-- Upload Area -->
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <p class="upload-text">Drop GPX file here</p>
+                            <p class="upload-subtext">or click to select</p>
+                            <input type="file" id="fileInput" accept=".gpx" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Activity Type Selector -->
+                    <div class="activity-type-selector">
+                        <label class="activity-type-label">Activity Type:</label>
+                        <div class="activity-type-options">
+                            <label class="activity-option">
+                                <input type="radio" name="activity_type" value="trail" checked>
+                                <span>Trail</span>
+                            </label>
+                            <label class="activity-option">
+                                <input type="radio" name="activity_type" value="road">
+                                <span>Road</span>
+                            </label>
+                            <label class="activity-option">
+                                <input type="radio" name="activity_type" value="hike">
+                                <span>Hike</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="upload-button" id="submitBtn">Grade this route</button>
+
+                    <!-- Loading State -->
+                    <div class="loading-state" id="loadingState" style="display: none;">
+                        <p class="loading-text">Analyzing route...</p>
+                    </div>
+
+                    <!-- Error Display -->
+                    <div class="error-display" id="errorDisplay" style="display: none;">
+                        <p class="error-text" id="errorMessage"></p>
+                    </div>
+
+                    <!-- Result Area -->
+                    <div class="result-area" id="resultArea" style="display: none;">
+                        <div class="result-card">
+                            <!-- Grade Display -->
+                            <div class="result-grade-section">
+                                <div class="result-grade-letter" id="resultGradeLetter">A</div>
+                                <div class="result-grade-info">
+                                    <div class="result-tds">
+                                        <span id="resultTDS">10</span><span class="result-tds-label">/10</span>
+                                    </div>
+                                    <div class="result-effort" id="resultEffort">Effort Descriptor</div>
+                                </div>
+                            </div>
+
+                            <!-- Stats Grid -->
+                            <div class="result-stats-grid">
+                                <div class="result-stat">
+                                    <span class="result-stat-label">Distance</span>
+                                    <span class="result-stat-value" id="resultDistance">0 km</span>
+                                </div>
+                                <div class="result-stat">
+                                    <span class="result-stat-label">Elevation Gain</span>
+                                    <span class="result-stat-value" id="resultGain">0 m</span>
+                                </div>
+                                <div class="result-stat">
+                                    <span class="result-stat-label">Elevation Density</span>
+                                    <span class="result-stat-value" id="resultED">0 m/km</span>
+                                </div>
+                                <div class="result-stat">
+                                    <span class="result-stat-label">Climbs</span>
+                                    <span class="result-stat-value" id="resultClimbs">0</span>
+                                </div>
+                            </div>
+
+                            <!-- Elevation Profile -->
+                            <div class="result-profile-section">
+                                <h3 class="result-profile-title">Elevation Profile</h3>
+                                <svg class="elevation-profile-svg" id="elevationProfile" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid meet">
+                                    <defs>
+                                        <linearGradient id="profileGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" style="stop-color: var(--color-accent, #FF4E50); stop-opacity: 0.3" />
+                                            <stop offset="100%" style="stop-color: var(--color-accent, #FF4E50); stop-opacity: 0.05" />
+                                        </linearGradient>
+                                    </defs>
+                                    <!-- Grid lines -->
+                                    <g class="profile-grid" opacity="0.1">
+                                        <line x1="0" y1="50" x2="800" y2="50" stroke="currentColor" stroke-width="1" />
+                                        <line x1="0" y1="100" x2="800" y2="100" stroke="currentColor" stroke-width="1" />
+                                        <line x1="0" y1="150" x2="800" y2="150" stroke="currentColor" stroke-width="1" />
+                                    </g>
+                                    <!-- Polyline for elevation (will be populated by JS) -->
+                                    <polyline class="profile-line" id="profilePolyline" points="" fill="url(#profileGradient)" stroke="var(--color-accent, #FF4E50)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+
+                            <!-- Grade Another Button -->
+                            <button class="upload-button upload-button-secondary" id="gradeAnotherBtn">Grade another route</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
     </div>
     <script src="/scripts/components.js"></script>
+    <script src="/scripts/route-analyzer.js"></script>
 </body>
 </html>
