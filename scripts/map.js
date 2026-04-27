@@ -932,7 +932,9 @@ async function loadRMMRoutes() {
         var childPixels = [];
 
         trails.forEach(function(trail, i) {
-            var angle = (i / n) * 2 * Math.PI - Math.PI / 2 - Math.PI / 3; // start 10 o'clock, clockwise
+            var arcStart = -5 * Math.PI / 6;  // 10 o'clock
+            var arcSweep = Math.PI;            // 180° arc to 4 o'clock
+            var angle = arcStart + (i / Math.max(n - 1, 1)) * arcSweep;
             var px = center.x + radius * Math.cos(angle);
             var py = center.y + radius * Math.sin(angle);
             childPixels.push({ x: px, y: py });
