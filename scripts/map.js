@@ -571,14 +571,23 @@ function startRoutePulse(coords) {
 
     var index = 0;
     var total = coords.length;
-    var speed = Math.max(20, Math.floor(4000 / total));
+    var PX_PER_MS = 0.08; // constant visual speed (~80 px/s at any zoom)
 
     function step() {
         if (index >= total) { index = 0; }
         var c = coords[index];
         pulseMarker.setLngLat([c[0], c[1]]);
+
+        // Calculate delay from screen-space distance to next point
+        var next = (index + 1) % total;
+        var nc = coords[next];
+        var cp = map.project([c[0], c[1]]);
+        var np = map.project([nc[0], nc[1]]);
+        var dist = Math.sqrt((np.x - cp.x) * (np.x - cp.x) + (np.y - cp.y) * (np.y - cp.y));
+        var delay = Math.max(16, Math.round(dist / PX_PER_MS));
+
         index++;
-        pulseAnimation = setTimeout(step, speed);
+        pulseAnimation = setTimeout(step, delay);
     }
     step();
 }
