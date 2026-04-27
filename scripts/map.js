@@ -927,12 +927,12 @@ async function loadRMMRoutes() {
         stopRoutePulse();
 
         var n = trails.length;
-        var radius = 30; // px from primary centre — tight cluster
+        var radius = 22; // px from primary centre — tight cluster
         var center = map.project(lngLat);
         var childPixels = [];
 
         trails.forEach(function(trail, i) {
-            var angle = (i / n) * 2 * Math.PI - Math.PI / 2; // start top, clockwise
+            var angle = (i / n) * 2 * Math.PI - Math.PI / 2 - Math.PI / 3; // start 10 o'clock, clockwise
             var px = center.x + radius * Math.cos(angle);
             var py = center.y + radius * Math.sin(angle);
             childPixels.push({ x: px, y: py });
