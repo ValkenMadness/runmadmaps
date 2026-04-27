@@ -571,7 +571,7 @@ function startRoutePulse(coords) {
 
     var index = 0;
     var total = coords.length;
-    var speed = Math.max(20, Math.floor(3000 / total));
+    var speed = Math.max(20, Math.floor(4000 / total));
 
     function step() {
         if (index >= total) { index = 0; }
