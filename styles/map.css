@@ -342,6 +342,204 @@
     cursor: pointer;
 }
 
+/* ============================================
+   Filter Sidebar
+   ============================================ */
+
+/* Toggle button — top-left of map */
+.rmm-filter-toggle {
+    position: fixed;
+    top: calc(var(--nav-height, 64px) + 12px);
+    left: 12px;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    background: #171A14;
+    border: 1px solid #2a2e24;
+    border-radius: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.15s;
+}
+
+.rmm-filter-toggle:hover {
+    background: #1f2219;
+}
+
+.rmm-filter-toggle svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #FFFFFF;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Panel */
+.rmm-filter-panel {
+    position: fixed;
+    top: var(--nav-height, 64px);
+    left: 0;
+    bottom: 0;
+    width: 240px;
+    background: #171A14;
+    border-right: 1px solid #2a2e24;
+    z-index: 9;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    font-family: 'Space Mono', monospace;
+    scrollbar-width: thin;
+    scrollbar-color: #2a2e24 transparent;
+}
+
+.rmm-filter-panel.open {
+    transform: translateX(0);
+}
+
+/* Panel header */
+.rmm-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid #2a2e24;
+}
+
+.rmm-filter-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.rmm-filter-close {
+    background: none;
+    border: none;
+    color: #6b7560;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s;
+}
+
+.rmm-filter-close:hover {
+    color: #FFFFFF;
+}
+
+.rmm-filter-close svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* Section grouping */
+.rmm-filter-section {
+    padding: 14px 16px 6px;
+}
+
+.rmm-filter-section-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6b7560;
+    margin-bottom: 10px;
+}
+
+/* Individual toggle row */
+.rmm-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+}
+
+.rmm-filter-row-label {
+    font-size: 12px;
+    color: #a8b09e;
+    user-select: none;
+}
+
+.rmm-filter-row.disabled .rmm-filter-row-label {
+    color: #3a3e34;
+}
+
+/* Toggle switch */
+.rmm-toggle {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.rmm-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.rmm-toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #2a2e24;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.rmm-toggle input:checked + .rmm-toggle-track {
+    background: #FF4E50;
+}
+
+.rmm-toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.rmm-toggle input:checked + .rmm-toggle-track::after {
+    transform: translateX(14px);
+}
+
+/* Disabled toggle */
+.rmm-filter-row.disabled .rmm-toggle-track {
+    background: #1e2219;
+    cursor: not-allowed;
+}
+
+.rmm-filter-row.disabled .rmm-toggle-track::after {
+    background: #3a3e34;
+}
+
+/* Divider between sections */
+.rmm-filter-divider {
+    height: 1px;
+    background: #2a2e24;
+    margin: 4px 16px;
+}
+
+/* Hide cluster markers when routes are toggled off */
+.rmm-clusters-hidden .rmm-cluster-primary,
+.rmm-clusters-hidden .rmm-cluster-secondary {
+    display: none !important;
+}
+
 /* --- Mobile --- */
 @media (max-width: 768px) {
     #map-container {
@@ -351,5 +549,14 @@
     .mapboxgl-ctrl-top-right {
         top: 8px;
         right: 8px;
+    }
+
+    .rmm-filter-panel {
+        width: 220px;
+    }
+
+    .rmm-filter-toggle {
+        top: calc(var(--nav-height, 64px) + 8px);
+        left: 8px;
     }
 }

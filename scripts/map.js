@@ -1241,6 +1241,178 @@ async function addDataLayers(config) {
     setupHoverInteractions();
 }
 
+// --- Filter Sidebar ---
+// Configuration for all toggleable layer groups.
+// Each entry maps a filter key to the GL layer IDs it controls.
+// `dom` flags entries that also need DOM marker toggling (e.g. cluster markers).
+// `placeholder` flags entries for future features (toggle disabled).
+var FILTER_GROUPS = {
+    markers: {
+        label: 'Markers',
+        items: [
+            { key: 'peaks',  label: 'Peaks',  layers: ['peaks', 'peaks-t3-hover'] },
+            { key: 'caves',  label: 'Caves',  layers: ['caves', 'caves-t3-hover'] }
+        ]
+    },
+    routes: {
+        label: 'Routes',
+        items: [
+            { key: 'rmm-routes', label: 'RMM Routes', layers: ['rmm-routes', 'rmm-routes-highlight', 'rmm-route-labels', 'rmm-route-starts'], dom: 'clusters' }
+        ]
+    },
+    trails: {
+        label: 'Trails',
+        items: [
+            { key: 'trails-path',    label: 'Paths',    layers: ['rmm-trails-path'] },
+            { key: 'trails-track',   label: 'Tracks',   layers: ['rmm-trails-track'] },
+            { key: 'trails-footway', label: 'Footways', layers: ['rmm-trails-footway'] },
+            { key: 'trails-steps',   label: 'Steps',    layers: ['rmm-trails-steps'] }
+        ]
+    },
+    overlays: {
+        label: 'Overlays',
+        items: [
+            { key: 'contours', label: 'Contour Lines', layers: ['rmm-contours'] }
+        ]
+    },
+    future: {
+        label: 'Coming Soon',
+        items: [
+            { key: 'events', label: 'Events',             layers: [], placeholder: true },
+            { key: 'pois',   label: 'Points of Interest', layers: [], placeholder: true },
+            { key: 'zones',  label: 'Zones',              layers: [], placeholder: true }
+        ]
+    }
+};
+
+function buildFilterSidebar() {
+    // Toggle button (layers icon)
+    var btn = document.createElement('button');
+    btn.className = 'rmm-filter-toggle';
+    btn.setAttribute('aria-label', 'Toggle map filters');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2 L2 7 L12 12 L22 7 Z"/><path d="M2 17 L12 22 L22 17"/><path d="M2 12 L12 17 L22 12"/></svg>';
+    document.body.appendChild(btn);
+
+    // Panel
+    var panel = document.createElement('div');
+    panel.className = 'rmm-filter-panel';
+    panel.id = 'rmm-filter-panel';
+
+    // Header
+    var header = document.createElement('div');
+    header.className = 'rmm-filter-header';
+    header.innerHTML =
+        '<span class="rmm-filter-title">Layers</span>' +
+        '<button class="rmm-filter-close" aria-label="Close filters">' +
+        '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+        '</button>';
+    panel.appendChild(header);
+
+    // Build sections
+    var groupKeys = Object.keys(FILTER_GROUPS);
+    groupKeys.forEach(function(groupKey, gi) {
+        var group = FILTER_GROUPS[groupKey];
+        var section = document.createElement('div');
+        section.className = 'rmm-filter-section';
+
+        var sectionLabel = document.createElement('div');
+        sectionLabel.className = 'rmm-filter-section-label';
+        sectionLabel.textContent = group.label;
+        section.appendChild(sectionLabel);
+
+        group.items.forEach(function(item) {
+            var row = document.createElement('div');
+            row.className = 'rmm-filter-row' + (item.placeholder ? ' disabled' : '');
+
+            var label = document.createElement('span');
+            label.className = 'rmm-filter-row-label';
+            label.textContent = item.label;
+
+            var toggle = document.createElement('label');
+            toggle.className = 'rmm-toggle';
+
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = !item.placeholder;
+            checkbox.disabled = !!item.placeholder;
+            checkbox.dataset.filterKey = item.key;
+
+            var track = document.createElement('span');
+            track.className = 'rmm-toggle-track';
+
+            toggle.appendChild(checkbox);
+            toggle.appendChild(track);
+            row.appendChild(label);
+            row.appendChild(toggle);
+            section.appendChild(row);
+
+            // Wire up toggle
+            if (!item.placeholder) {
+                checkbox.addEventListener('change', function() {
+                    var visible = this.checked;
+                    toggleFilterLayers(item, visible);
+                });
+            }
+        });
+
+        panel.appendChild(section);
+
+        // Divider between sections (not after the last)
+        if (gi < groupKeys.length - 1) {
+            var divider = document.createElement('div');
+            divider.className = 'rmm-filter-divider';
+            panel.appendChild(divider);
+        }
+    });
+
+    document.body.appendChild(panel);
+
+    // Open/close behaviour
+    btn.addEventListener('click', function() {
+        panel.classList.toggle('open');
+    });
+
+    header.querySelector('.rmm-filter-close').addEventListener('click', function() {
+        panel.classList.remove('open');
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && panel.classList.contains('open')) {
+            panel.classList.remove('open');
+        }
+    });
+
+    // Close when clicking outside the panel (on the map)
+    document.getElementById('map-container').addEventListener('click', function() {
+        if (panel.classList.contains('open')) {
+            panel.classList.remove('open');
+        }
+    });
+}
+
+function toggleFilterLayers(item, visible) {
+    var visibility = visible ? 'visible' : 'none';
+
+    item.layers.forEach(function(layerId) {
+        if (map && map.getLayer(layerId)) {
+            map.setLayoutProperty(layerId, 'visibility', visibility);
+        }
+    });
+
+    // Handle DOM markers (route clusters)
+    if (item.dom === 'clusters') {
+        var container = map.getCanvasContainer();
+        if (visible) {
+            container.closest('#map-container').classList.remove('rmm-clusters-hidden');
+        } else {
+            container.closest('#map-container').classList.add('rmm-clusters-hidden');
+            // Also stop any active pulse and close popups
+            stopRoutePulse();
+        }
+    }
+}
+
 // --- Map initialisation ---
 function initMap(containerId) {
     var targetId = containerId || 'map-container';
@@ -1292,10 +1464,13 @@ function initMap(containerId) {
                 await loadAllMarkerIcons();
                 await addDataLayers(config);
 
-                // 3. Load style_config from Supabase (fails gracefully)
+                // 3. Build filter sidebar (after layers exist)
+                buildFilterSidebar();
+
+                // 4. Load style_config from Supabase (fails gracefully)
                 loadStyleConfig();
 
-                // 4. Signal map is ready
+                // 5. Signal map is ready
                 window.rmmMapReady = true;
             });
         })
