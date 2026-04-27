@@ -822,17 +822,21 @@ async function loadRMMRoutes() {
     // --- Cluster interaction ---
     // State shared across all cluster markers within this loadRMMRoutes call.
     var clusterCollapseTimer = null;
-    var clusterSecondaries = [];
+    var clusterSecondaries = [];    // mapboxgl.Marker instances
+    var clusterBridgeEl = null;     // invisible SVG hit area connecting primary → children
 
     function collapseCluster() {
         clusterCollapseTimer = null;
         clusterSecondaries.forEach(function(m) { m.remove(); });
         clusterSecondaries = [];
+        if (clusterBridgeEl) { clusterBridgeEl.remove(); clusterBridgeEl = null; }
+        routePopup.remove();
         clearHighlight();
+        stopRoutePulse();
     }
 
     function scheduleCollapse() {
-        clusterCollapseTimer = setTimeout(collapseCluster, 150);
+        clusterCollapseTimer = setTimeout(collapseCluster, 350);
     }
 
     function cancelCollapse() {
@@ -842,24 +846,97 @@ async function loadRMMRoutes() {
         }
     }
 
+    // Build an invisible SVG overlay that covers the area between the primary
+    // marker and all its children. This lets the mouse travel freely between
+    // dots without falling into the gap and triggering collapse.
+    function createBridge(centerPx, childPoints) {
+        if (clusterBridgeEl) { clusterBridgeEl.remove(); clusterBridgeEl = null; }
+
+        // Compute a bounding box around center + all child points, with generous padding
+        var pad = 12;
+        var allX = [centerPx.x].concat(childPoints.map(function(p) { return p.x; }));
+        var allY = [centerPx.y].concat(childPoints.map(function(p) { return p.y; }));
+        var minX = Math.min.apply(null, allX) - pad;
+        var minY = Math.min.apply(null, allY) - pad;
+        var maxX = Math.max.apply(null, allX) + pad;
+        var maxY = Math.max.apply(null, allY) + pad;
+        var w = maxX - minX;
+        var h = maxY - minY;
+
+        // Build a convex polygon path from centre to each child (fan shape)
+        // with padding around each point for comfortable mouse travel
+        var cx = centerPx.x - minX;
+        var cy = centerPx.y - minY;
+
+        // Sort children by angle from centre for a clean convex hull
+        var sorted = childPoints.map(function(p) {
+            var dx = p.x - centerPx.x;
+            var dy = p.y - centerPx.y;
+            return { x: p.x - minX, y: p.y - minY, angle: Math.atan2(dy, dx) };
+        }).sort(function(a, b) { return a.angle - b.angle; });
+
+        // Build path: centre → each child with padding offsets
+        var points = [];
+        sorted.forEach(function(p) {
+            var dx = p.x - cx;
+            var dy = p.y - cy;
+            var len = Math.sqrt(dx * dx + dy * dy) || 1;
+            // Perpendicular offsets for width around each arm
+            var px = (-dy / len) * pad;
+            var py = (dx / len) * pad;
+            points.push((p.x + px) + ',' + (p.y + py));
+            points.push((p.x - px) + ',' + (p.y - py));
+        });
+        // Add centre point
+        points.push(cx + ',' + cy);
+
+        // Create SVG element positioned absolutely on the map container
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', w);
+        svg.setAttribute('height', h);
+        svg.style.position = 'absolute';
+        svg.style.left = minX + 'px';
+        svg.style.top = minY + 'px';
+        svg.style.pointerEvents = 'none';
+        svg.style.zIndex = '1';
+
+        var polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        polygon.setAttribute('points', points.join(' '));
+        polygon.setAttribute('fill', 'transparent');
+        polygon.style.pointerEvents = 'all';
+        svg.appendChild(polygon);
+
+        polygon.addEventListener('mouseenter', function() { cancelCollapse(); });
+        polygon.addEventListener('mouseleave', function() { scheduleCollapse(); });
+
+        // Append to the map's canvas container so it sits above the canvas
+        var container = map.getCanvasContainer();
+        container.appendChild(svg);
+        clusterBridgeEl = svg;
+    }
+
     // Radiate secondary markers around a cluster primary at the given lngLat.
     // Secondaries are positioned using a pixel-space radius so spacing is zoom-stable.
     function expandCluster(lngLat, trails) {
         cancelCollapse();
         clusterSecondaries.forEach(function(m) { m.remove(); });
         clusterSecondaries = [];
+        if (clusterBridgeEl) { clusterBridgeEl.remove(); clusterBridgeEl = null; }
+        routePopup.remove();
         clearHighlight();
+        stopRoutePulse();
 
         var n = trails.length;
-        var radius = 52; // px from primary centre
+        var radius = 30; // px from primary centre — tight cluster
         var center = map.project(lngLat);
+        var childPixels = [];
 
         trails.forEach(function(trail, i) {
             var angle = (i / n) * 2 * Math.PI - Math.PI / 2; // start top, clockwise
-            var point = map.unproject([
-                center.x + radius * Math.cos(angle),
-                center.y + radius * Math.sin(angle)
-            ]);
+            var px = center.x + radius * Math.cos(angle);
+            var py = center.y + radius * Math.sin(angle);
+            childPixels.push({ x: px, y: py });
+            var point = map.unproject([px, py]);
 
             var el = document.createElement('div');
             el.className = 'rmm-cluster-secondary';
@@ -871,15 +948,44 @@ async function loadRMMRoutes() {
             el.addEventListener('mouseenter', function() {
                 cancelCollapse();
                 highlightRoute(trail.properties.name);
+
+                // Show popup with route stats (mirrors single-start behaviour)
+                var props = trail.properties;
+                var routeName = props.display_name || props.name || '';
+                var html = '<div class="rmm-route-card">' +
+                    '<div class="rmm-route-card-grade">' + (props.grade_display || '') + '</div>' +
+                    '<div class="rmm-route-card-name">' + routeName + '</div>' +
+                    '<div class="rmm-route-card-stats">' +
+                        '<span>' + (props.distance_km || '') + ' km</span>' +
+                        '<span>' + (props.elevation_gain_m || '') + 'm gain</span>' +
+                        '<span>' + (props.elevation_density || '') + ' m/km</span>' +
+                    '</div>' +
+                    '<div class="rmm-route-card-action">Route details coming soon</div>' +
+                    '</div>';
+
+                // Position popup away from the trail, same as single starts
+                var markerLngLat = [point.lng, point.lat];
+                var trailCoords = window._rmmRouteCoords[props.name];
+                var popupAnchor = getPopupAnchorAwayFromTrail(markerLngLat, trailCoords);
+                routePopup.options.anchor = popupAnchor;
+                routePopup.setLngLat(markerLngLat).setHTML(html).addTo(map);
+
+                // Start pulse animation along the route
+                if (trailCoords) startRoutePulse(trailCoords);
             });
 
             el.addEventListener('mouseleave', function() {
+                routePopup.remove();
                 clearHighlight();
+                stopRoutePulse();
                 scheduleCollapse();
             });
 
             clusterSecondaries.push(marker);
         });
+
+        // Create invisible bridge between primary and all children
+        createBridge(center, childPixels);
     }
 
     // Create one primary Marker per cluster group.
