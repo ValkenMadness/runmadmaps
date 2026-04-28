@@ -318,9 +318,34 @@
 
 /* ============================================
    Cluster Start Markers
+
+   Structure:
+     .rmm-cluster-primary-wrap   ← Mapbox positions this (carries translate)
+       └ .rmm-cluster-primary    ← inner circle, scales on hover
+     .rmm-cluster-secondary-wrap ← Mapbox positions this
+       └ .rmm-cluster-secondary  ← inner circle, fan-in animation
+
+   The wrap/inner split is required because Mapbox writes inline `transform:
+   translate(...)` on the marker element. If we transformed the same element
+   for the shrink animation we'd overwrite the position. The wrap holds the
+   translate; the inner holds the scale.
    ============================================ */
 
-/* Primary — sits at the shared start coord; hover expands secondaries */
+/* Wrap — preserves the original 14×14 hit area even when the inner shrinks,
+   so hover stickiness isn't lost when the parent scales to 70% on expand. */
+.rmm-cluster-primary-wrap,
+.rmm-cluster-secondary-wrap {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Primary — sits at the shared start coord; hover expands secondaries.
+   Brief 1.1: trail markers are simple, clean circles — same look as a single
+   (non-cluster) start marker. */
 .rmm-cluster-primary {
     width: 14px;
     height: 14px;
@@ -328,18 +353,48 @@
     border: 2px solid #FFFFFF;
     border-radius: 50%;
     opacity: 0.9;
-    cursor: pointer;
+    pointer-events: none; /* events are handled on the wrap */
+    transform-origin: center;
+    transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Secondary — radiated around the primary on hover, one per trail */
+/* Brief 1.2: parent marker shrinks ~30% while children fan out. */
+.rmm-cluster-primary-wrap.is-expanded .rmm-cluster-primary {
+    transform: scale(0.7);
+    opacity: 0.75;
+}
+
+/* Secondary — radiated around the primary on hover, one per trail.
+   Brief 1.2: children sit at the original (full) marker size — same as a
+   single-trail start so all event markers read as the same primitive. */
 .rmm-cluster-secondary {
-    width: 10px;
-    height: 10px;
+    width: 14px;
+    height: 14px;
     background: #FF4E50;
     border: 2px solid #FFFFFF;
     border-radius: 50%;
-    opacity: 0.7;
-    cursor: pointer;
+    opacity: 0.9;
+    pointer-events: none; /* events are handled on the wrap */
+    transform-origin: center;
+    animation: rmm-cluster-secondary-in 220ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+/* Children fan in from a small scale with a slight overshoot, evoking the
+   "radiating from the parent" feel. animation-delay is set per-index in JS
+   so they appear to pop out one after another. */
+@keyframes rmm-cluster-secondary-in {
+    0%   { opacity: 0;   transform: scale(0.4); }
+    60%  { opacity: 1;   transform: scale(1.06); }
+    100% { opacity: 0.9; transform: scale(1); }
+}
+
+/* Respect the user's motion preference — disable bouncy entrances and the
+   parent shrink transition; the geometry still works, just without the
+   animation. */
+@media (prefers-reduced-motion: reduce) {
+    .rmm-cluster-primary { transition: none; }
+    .rmm-cluster-secondary { animation: none; }
 }
 
 /* ============================================
@@ -534,7 +589,12 @@
     margin: 4px 16px;
 }
 
-/* Hide cluster markers when routes are toggled off */
+/* Hide cluster markers when routes are toggled off.
+   Targets the wraps (which Mapbox positions) so the entire DOM marker is
+   removed from layout. The inner-class fallbacks keep behaviour stable in
+   case any caller still writes the legacy class names. */
+.rmm-clusters-hidden .rmm-cluster-primary-wrap,
+.rmm-clusters-hidden .rmm-cluster-secondary-wrap,
 .rmm-clusters-hidden .rmm-cluster-primary,
 .rmm-clusters-hidden .rmm-cluster-secondary {
     display: none !important;

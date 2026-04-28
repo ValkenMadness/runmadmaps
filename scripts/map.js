@@ -833,12 +833,20 @@ async function loadRMMRoutes() {
     var clusterCollapseTimer = null;
     var clusterSecondaries = [];    // mapboxgl.Marker instances
     var clusterBridgeEl = null;     // invisible SVG hit area connecting primary → children
+    var clusterPrimaryWrap = null;  // wrap of the currently-expanded primary (carries .is-expanded for the shrink)
 
     function collapseCluster() {
         clusterCollapseTimer = null;
         clusterSecondaries.forEach(function(m) { m.remove(); });
         clusterSecondaries = [];
         if (clusterBridgeEl) { clusterBridgeEl.remove(); clusterBridgeEl = null; }
+        if (clusterPrimaryWrap) {
+            clusterPrimaryWrap.classList.remove('is-expanded');
+            clusterPrimaryWrap = null;
+        }
+        // Defensive: strip the class from any other primaries in case state drifted
+        var stale = document.querySelectorAll('.rmm-cluster-primary-wrap.is-expanded');
+        for (var s = 0; s < stale.length; s++) stale[s].classList.remove('is-expanded');
         routePopup.remove();
         clearHighlight();
         stopRoutePulse();
@@ -926,41 +934,67 @@ async function loadRMMRoutes() {
 
     // Radiate secondary markers around a cluster primary at the given lngLat.
     // Secondaries are positioned using a pixel-space radius so spacing is zoom-stable.
-    function expandCluster(lngLat, trails) {
+    //
+    // Brief 1.2 — fan-out geometry:
+    //   • Children orbit the parent starting at 9 o'clock (left) and going
+    //     clockwise around the parent. A fixed angular gap keeps small clusters
+    //     visually tight in the upper-left arc (no "opposite ends" effect).
+    //   • For very large clusters (n > FULL_CIRCLE_THRESHOLD) we fall back to
+    //     even spacing around the full circle so children don't overshoot.
+    //   • The parent gets `.is-expanded` to scale to 70% (CSS-driven) so the
+    //     children sit at the original marker size around a smaller hub.
+    function expandCluster(lngLat, trails, primaryWrap) {
         cancelCollapse();
         clusterSecondaries.forEach(function(m) { m.remove(); });
         clusterSecondaries = [];
         if (clusterBridgeEl) { clusterBridgeEl.remove(); clusterBridgeEl = null; }
+        // Clear shrink state from any previously-expanded primary
+        if (clusterPrimaryWrap && clusterPrimaryWrap !== primaryWrap) {
+            clusterPrimaryWrap.classList.remove('is-expanded');
+        }
         routePopup.remove();
         clearHighlight();
         stopRoutePulse();
 
+        // Tag the primary wrapper — CSS scales the inner circle to 70%
+        if (primaryWrap) {
+            primaryWrap.classList.add('is-expanded');
+            clusterPrimaryWrap = primaryWrap;
+        }
+
         var n = trails.length;
-        var radius = 22; // px from primary centre — tight cluster
+        var radius = 26;                       // px from primary centre
+        var FIXED_GAP = 40 * Math.PI / 180;    // 40° per child (chord ≈ 17.8 px @ r=26 → ~3.8 px between 14 px markers)
+        var FULL_CIRCLE_THRESHOLD = 9;
+        var startAngle = Math.PI;              // 9 o'clock (screen coords: y-down)
+        var step = (n > FULL_CIRCLE_THRESHOLD) ? (2 * Math.PI / n) : FIXED_GAP;
         var center = map.project(lngLat);
         var childPixels = [];
 
         trails.forEach(function(trail, i) {
-            var arcStart = -5 * Math.PI / 6;  // 10 o'clock
-            var arcSweep = Math.PI;            // 180° arc to 4 o'clock
-            var angle = arcStart + (i / Math.max(n - 1, 1)) * arcSweep;
+            // angle increases ⇒ visually clockwise (screen y is flipped)
+            var angle = startAngle + i * step;
             var px = center.x + radius * Math.cos(angle);
             var py = center.y + radius * Math.sin(angle);
             childPixels.push({ x: px, y: py });
             var point = map.unproject([px, py]);
 
-            var el = document.createElement('div');
-            el.className = 'rmm-cluster-secondary';
+            var wrap = document.createElement('div');
+            wrap.className = 'rmm-cluster-secondary-wrap';
+            var inner = document.createElement('div');
+            inner.className = 'rmm-cluster-secondary';
+            // Stagger the fan-in so children appear to radiate from the parent
+            inner.style.animationDelay = (i * 30) + 'ms';
+            wrap.appendChild(inner);
 
-            var marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+            var marker = new mapboxgl.Marker({ element: wrap, anchor: 'center' })
                 .setLngLat([point.lng, point.lat])
                 .addTo(map);
 
-            el.addEventListener('mouseenter', function() {
+            function onSecondaryEnter() {
                 cancelCollapse();
                 highlightRoute(trail.properties.name);
 
-                // Show popup with route stats (mirrors single-start behaviour)
                 var props = trail.properties;
                 var routeName = props.display_name || props.name || '';
                 var html = '<div class="rmm-route-card">' +
@@ -974,22 +1008,43 @@ async function loadRMMRoutes() {
                     '<div class="rmm-route-card-action">Route details coming soon</div>' +
                     '</div>';
 
-                // Position popup away from the trail, same as single starts
-                var markerLngLat = [point.lng, point.lat];
                 var trailCoords = window._rmmRouteCoords[props.name];
-                var popupAnchor = getPopupAnchorAwayFromTrail(markerLngLat, trailCoords);
+
+                // Brief: on parent-child markers the popup ALWAYS appears below
+                // the whole cluster so it never overlaps the trail highlight or
+                // the fanned children. We anchor to the PARENT lngLat (not the
+                // child), so the popup hangs centrally beneath the device
+                // regardless of which child is hovered.
+                //
+                // Edge fallback: if the parent is near the bottom of the map
+                // viewport, flip the anchor so the popup floats above instead
+                // of being clipped off-screen.
+                var canvas = map.getCanvas();
+                var parentPx = map.project(lngLat);
+                var pxBelow = canvas.clientHeight - parentPx.y;
+                var APPROX_POPUP_HEIGHT = 160; // card + tip + offset margin
+                var popupAnchor = (pxBelow < APPROX_POPUP_HEIGHT) ? 'bottom' : 'top';
                 routePopup.options.anchor = popupAnchor;
-                routePopup.setLngLat(markerLngLat).setHTML(html).addTo(map);
+                routePopup.setLngLat(lngLat).setHTML(html).addTo(map);
 
-                // Start pulse animation along the route
                 if (trailCoords) startRoutePulse(trailCoords);
-            });
+            }
 
-            el.addEventListener('mouseleave', function() {
+            function onSecondaryLeave() {
                 routePopup.remove();
                 clearHighlight();
                 stopRoutePulse();
                 scheduleCollapse();
+            }
+
+            wrap.addEventListener('mouseenter', onSecondaryEnter);
+            wrap.addEventListener('mouseleave', onSecondaryLeave);
+            // Mobile/touch — mouseenter does not fire on tap. Tapping a child
+            // triggers the same select behaviour. (Cluster expansion itself is
+            // wired on the primary's click handler below.)
+            wrap.addEventListener('click', function(e) {
+                e.stopPropagation();
+                onSecondaryEnter();
             });
 
             clusterSecondaries.push(marker);
@@ -1000,24 +1055,60 @@ async function loadRMMRoutes() {
     }
 
     // Create one primary Marker per cluster group.
-    // Marker rendering (the el + className) is intentionally separate from the
-    // hover/reveal logic so the circle can be swapped for custom artwork later.
+    // Marker rendering (the wrap + inner circle) is intentionally separate from
+    // the hover/reveal logic so the circle can be swapped for custom artwork
+    // later. The wrap is what Mapbox positions; the inner is what we visually
+    // transform on hover (scale to 70%) without fighting Mapbox's translate.
     clusterGroups.forEach(function(group) {
-        var el = document.createElement('div');
-        el.className = 'rmm-cluster-primary';
+        var wrap = document.createElement('div');
+        wrap.className = 'rmm-cluster-primary-wrap';
+        var inner = document.createElement('div');
+        inner.className = 'rmm-cluster-primary';
+        wrap.appendChild(inner);
 
-        new mapboxgl.Marker({ element: el, anchor: 'center' })
+        new mapboxgl.Marker({ element: wrap, anchor: 'center' })
             .setLngLat(group.lngLat)
             .addTo(map);
 
-        el.addEventListener('mouseenter', function() {
+        wrap.addEventListener('mouseenter', function() {
             cancelCollapse();
-            expandCluster(group.lngLat, group.trails);
+            expandCluster(group.lngLat, group.trails, wrap);
         });
 
-        el.addEventListener('mouseleave', function() {
+        wrap.addEventListener('mouseleave', function() {
             scheduleCollapse();
         });
+
+        // Mobile/touch — tap to expand. On desktop, mouseenter has already
+        // expanded the cluster, so this becomes a no-op. We don't toggle on
+        // re-tap because a tap landing on a child should select it (handled
+        // separately on the child wrap).
+        wrap.addEventListener('click', function(e) {
+            e.stopPropagation();
+            cancelCollapse();
+            if (!wrap.classList.contains('is-expanded')) {
+                expandCluster(group.lngLat, group.trails, wrap);
+            }
+        });
+    });
+
+    // Mobile dismissal — tapping anywhere on the map canvas (i.e. not on a
+    // cluster element) collapses any open cluster. Without this the fan stays
+    // open forever on touch devices since mouseleave never fires.
+    map.on('click', function(e) {
+        var target = e.originalEvent && e.originalEvent.target;
+        if (!target) return;
+        var insideCluster = target.closest && target.closest(
+            '.rmm-cluster-primary-wrap, .rmm-cluster-secondary-wrap'
+        );
+        if (!insideCluster && clusterSecondaries.length) collapseCluster();
+    });
+
+    // Collapse on map pan/zoom — the fan is positioned in pixel space, so it
+    // becomes visually wrong as soon as the camera moves. Collapsing avoids
+    // the children drifting away from the parent during a drag.
+    map.on('movestart', function() {
+        if (clusterSecondaries.length) collapseCluster();
     });
 
     // Start-dot hover — popup + reveal line + pulse
