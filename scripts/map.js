@@ -828,6 +828,33 @@ async function loadRMMRoutes() {
         map.setPaintProperty('rmm-route-labels', 'text-opacity', 0);
     }
 
+    // --- Zoom-based scale parity with GL singletons ---
+    // The GL `rmm-route-starts` layer interpolates circle-radius 3 → 5 → 7
+    // across zooms 8 → 12 → 15 with a 2px stroke that extends outside the
+    // radius. Visible diameter therefore goes 10 → 14 → 18 px. The DOM cluster
+    // primary has a natural visible diameter of 18 (14 content + 2px border
+    // each side). Without this scaling the primary looks noticeably bigger
+    // than the singletons at low/mid zoom — what the brief flagged as "doesn't
+    // scale the same way the other markers do". We publish a CSS variable on
+    // <html> that the cluster primary/secondary CSS rules consume.
+    function computeClusterPrimaryScale(zoom) {
+        var radius;
+        if (zoom <= 8) radius = 3;
+        else if (zoom >= 15) radius = 7;
+        else if (zoom <= 12) radius = 3 + (zoom - 8) * (5 - 3) / (12 - 8);
+        else radius = 5 + (zoom - 12) * (7 - 5) / (15 - 12);
+        var visibleDiameter = (radius + 2) * 2; // +2 for stroke (drawn outside radius)
+        return visibleDiameter / 18;
+    }
+    function syncClusterScale() {
+        document.documentElement.style.setProperty(
+            '--rmm-cluster-scale',
+            computeClusterPrimaryScale(map.getZoom())
+        );
+    }
+    syncClusterScale();
+    map.on('zoom', syncClusterScale);
+
     // --- Cluster interaction ---
     // State shared across all cluster markers within this loadRMMRoutes call.
     var clusterCollapseTimer = null;
