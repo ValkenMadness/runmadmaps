@@ -731,7 +731,16 @@ async function loadRMMRoutes() {
         source: 'rmm-routes',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
-            'line-color': '#FF4E50',
+            'line-color': [
+                'match', ['get', 'grade'],
+                'A', '#FF4E50',
+                'B', '#D4732A',
+                'C', '#D4A017',
+                'D', '#6B8F4A',
+                'E', '#4A7B6B',
+                'F', 'rgba(23, 26, 20, 0.5)',
+                '#FF4E50'
+            ],
             'line-width': [
                 'interpolate', ['linear'], ['zoom'],
                 8, 1.5, 10, 2, 12, 3, 14, 4, 16, 5
@@ -748,7 +757,16 @@ async function loadRMMRoutes() {
         source: 'rmm-routes',
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
-            'line-color': '#FF4E50',
+            'line-color': [
+                'match', ['get', 'grade'],
+                'A', '#FF4E50',
+                'B', '#D4732A',
+                'C', '#D4A017',
+                'D', '#6B8F4A',
+                'E', '#4A7B6B',
+                'F', 'rgba(23, 26, 20, 0.5)',
+                '#FF4E50'
+            ],
             'line-width': [
                 'interpolate', ['linear'], ['zoom'],
                 8, 2, 10, 2.5, 12, 3.5, 14, 5, 16, 6
