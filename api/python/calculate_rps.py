@@ -15,7 +15,7 @@ import supabase
 from rps_engine import RPSEngine
 from config import Config
 
-ALLOWED_ORIGIN = "https://runmadmaps.com"
+ALLOWED_ORIGINS = ["https://runmadmaps.com", "http://localhost:3000"]
 
 _STRIP_KEYS = {"ceiling", "weight", "contribution", "exponent", "decay"}
 
@@ -64,9 +64,14 @@ class handler(BaseHTTPRequestHandler):
         pass
 
     def _cors_headers(self):
-        self.send_header("Access-Control-Allow-Origin", ALLOWED_ORIGIN)
+        origin = self.headers.get("Origin", "")
+        if origin in ALLOWED_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
+        else:
+            self.send_header("Access-Control-Allow-Origin", ALLOWED_ORIGINS[0])
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Credentials", "true")
 
     def _send_json(self, status: int, data: dict):
         body = json.dumps(data).encode()

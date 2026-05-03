@@ -104,15 +104,185 @@
                 </div>
             </div>
 
-            <!-- Section 4: CTA -->
-            <div class="section section-cta">
+            <!-- Section 4: Live Score (logged in) -->
+            <div class="section section-cta" id="rps-live-section" style="display: none;">
+                <h2 class="section-heading">Your Runner Performance Score</h2>
+                <div id="rps-loading" class="rps-loading">
+                    <p class="section-body">Loading your score...</p>
+                </div>
+                <div id="rps-display" style="display: none;">
+                    <div class="rps-score-hero">
+                        <div class="rps-score-number" id="rps-score-value">0</div>
+                        <div class="rps-level-badge" id="rps-level-badge">Foundation</div>
+                    </div>
+                    <div class="rps-level-bar">
+                        <div class="rps-level-fill" id="rps-level-fill"></div>
+                    </div>
+                    <p class="rps-level-desc" id="rps-level-desc"></p>
+                    <div class="rps-components" id="rps-components"></div>
+                    <p class="rps-meta" id="rps-meta"></p>
+                </div>
+                <div id="rps-empty" style="display: none;">
+                    <p class="section-body">No activities synced yet. Sync your Strava data to calculate your score.</p>
+                    <button class="cta-btn" onclick="syncActivities()">Sync Activities</button>
+                </div>
+                <div id="rps-error" style="display: none;">
+                    <p class="section-body">Unable to load your score right now. Try again later.</p>
+                </div>
+            </div>
+
+            <!-- Section 4: CTA (logged out) -->
+            <div class="section section-cta" id="rps-cta-section">
                 <h2 class="section-heading">See where you stand</h2>
-                <p class="section-body">Connect your Strava or Garmin account and get your first score.</p>
-                <span class="coming-soon-badge">Coming Soon</span>
+                <p class="section-body">Connect your Strava account and get your first score.</p>
+                <button class="cta-btn" onclick="RMMAuth.login('/intelligence/fitness')">Connect Strava</button>
             </div>
 
         </div>
     </div>
     <script src="/scripts/components.js"></script>
+    <script src="/scripts/auth.js"></script>
+    <script>
+    (function() {
+      'use strict';
+
+      var liveSection = document.getElementById('rps-live-section');
+      var ctaSection = document.getElementById('rps-cta-section');
+
+      RMMAuth.onReady(function(athlete) {
+        if (athlete) {
+          // Logged in — show live score section
+          liveSection.style.display = '';
+          ctaSection.style.display = 'none';
+          loadRPS(athlete);
+        } else {
+          // Not logged in — show CTA
+          liveSection.style.display = 'none';
+          ctaSection.style.display = '';
+        }
+      });
+
+      function loadRPS(athlete) {
+        var loading = document.getElementById('rps-loading');
+        var display = document.getElementById('rps-display');
+        var empty = document.getElementById('rps-empty');
+        var error = document.getElementById('rps-error');
+
+        fetch('/api/python/calculate-rps', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ athlete_id: String(athlete.strava_id) })
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function(data) {
+          loading.style.display = 'none';
+
+          // Check if we have layer data or single result
+          var result = data.result || (data.layer3_overall) || null;
+
+          // If no result and no layer1, try layer1.trail as fallback
+          if (!result && data.layer1) {
+            result = data.layer1.trail || data.layer1.road || data.layer1.hike;
+          }
+
+          if (!result || result.activity_count === 0) {
+            empty.style.display = '';
+            return;
+          }
+
+          renderRPS(result);
+          display.style.display = '';
+        })
+        .catch(function(err) {
+          console.error('RMM: RPS load error:', err);
+          loading.style.display = 'none';
+          error.style.display = '';
+        });
+      }
+
+      function renderRPS(result) {
+        var rps = Math.round(result.rps || 0);
+        var level = result.level || {};
+
+        document.getElementById('rps-score-value').textContent = rps;
+        document.getElementById('rps-level-badge').textContent = level.name || 'Foundation';
+        document.getElementById('rps-level-badge').className = 'rps-level-badge rps-level-' + (level.name || 'foundation').toLowerCase();
+
+        // Level bar fill
+        var fill = document.getElementById('rps-level-fill');
+        fill.style.width = rps + '%';
+
+        // Level description
+        var desc = document.getElementById('rps-level-desc');
+        var pos = level.position_pct != null ? Math.round(level.position_pct) : 0;
+        desc.textContent = pos + '% through ' + (level.name || 'Foundation') + ' level';
+
+        // Components
+        var comps = result.components || {};
+        var compContainer = document.getElementById('rps-components');
+        compContainer.innerHTML = '';
+
+        var compOrder = ['distance', 'speed_efficiency', 'elevation', 'pace_consistency', 'frequency'];
+        var compLabels = {
+          distance: 'Distance',
+          speed_efficiency: 'Speed Efficiency',
+          elevation: 'Elevation',
+          pace_consistency: 'Pace Consistency',
+          frequency: 'Frequency'
+        };
+
+        compOrder.forEach(function(key) {
+          var comp = comps[key];
+          if (!comp) return;
+          var score = Math.round(comp.score || comp.score_modified || 0);
+          var bar = document.createElement('div');
+          bar.className = 'rps-comp-row';
+          bar.innerHTML =
+            '<span class="rps-comp-label">' + compLabels[key] + '</span>' +
+            '<div class="rps-comp-bar"><div class="rps-comp-fill" style="width:' + Math.min(score, 100) + '%"></div></div>' +
+            '<span class="rps-comp-score">' + score + '</span>';
+          compContainer.appendChild(bar);
+        });
+
+        // Meta
+        var meta = document.getElementById('rps-meta');
+        meta.textContent = (result.activity_count || 0) + ' activities in 90-day window';
+      }
+
+      window.syncActivities = function() {
+        var btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Syncing...';
+
+        fetch('/api/auth/sync-activities', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ days: 90 })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.synced > 0) {
+            // Reload to show the score
+            window.location.reload();
+          } else {
+            btn.textContent = 'No new activities found';
+            setTimeout(function() {
+              btn.disabled = false;
+              btn.textContent = 'Sync Activities';
+            }, 3000);
+          }
+        })
+        .catch(function() {
+          btn.textContent = 'Sync failed — try again';
+          btn.disabled = false;
+        });
+      };
+    })();
+    </script>
 </body>
 </html>

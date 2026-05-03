@@ -28,11 +28,12 @@
                     <div class="page-header-row">
                         <div>
                             <p class="page-header-label">DASHBOARD</p>
-                            <h1 class="page-header-title">Welcome back, Runner</h1>
+                            <h1 class="page-header-title" id="dash-welcome">Welcome back, Runner</h1>
                             <p class="page-header-subtitle">Your Cape Peninsula Trail Intelligence Companion</p>
                         </div>
-                        <div>
-                            <span class="coming-soon-badge" style="color: var(--color-accent); border-color: var(--color-accent);">Login Required at Launch</span>
+                        <div id="dash-auth-status">
+                            <span class="coming-soon-badge" style="color: var(--color-accent); border-color: var(--color-accent);" data-auth="logged-out">Login Required at Launch</span>
+                            <button class="cta-btn" data-auth="logged-out" onclick="RMMAuth.login('/dashboard')" style="display:none;margin-top:0.5rem;">Connect Strava</button>
                         </div>
                     </div>
                 </div>
@@ -217,20 +218,34 @@
                     <div class="dash-panel dash-panel-tall">
                         <div class="dash-panel-header">
                             <span class="dash-panel-title">Runner Performance Score</span>
+                            <a href="/intelligence/fitness" class="dash-panel-link">Details &#8594;</a>
                         </div>
-                        <div class="dash-panel-body"></div>
+                        <div class="dash-panel-body" id="dash-rps-body">
+                            <div style="padding: 1.5rem; text-align: center;">
+                                <p style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-muted);">Connect Strava to see your score</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="dash-panel dash-panel-tall">
                         <div class="dash-panel-header">
                             <span class="dash-panel-title">Race Readiness</span>
+                            <a href="/intelligence/readiness" class="dash-panel-link">Full Check &#8594;</a>
                         </div>
-                        <div class="dash-panel-body"></div>
+                        <div class="dash-panel-body" id="dash-readiness-body">
+                            <div style="padding: 1.5rem; text-align: center;">
+                                <p style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-muted);">Connect Strava to check readiness</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="dash-panel dash-panel-tall">
                         <div class="dash-panel-header">
                             <span class="dash-panel-title">Lifetime Summary</span>
                         </div>
-                        <div class="dash-panel-body"></div>
+                        <div class="dash-panel-body" id="dash-lifetime-body">
+                            <div style="padding: 1.5rem; text-align: center;">
+                                <p style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-muted);">Stats appear after syncing activities</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -255,15 +270,161 @@
         </div>
     </div>
     <script src="/scripts/components.js"></script>
+    <script src="/scripts/auth.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script src="/scripts/map.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var container = document.getElementById('dashboard-map');
-            if (container) {
-                window.RMMMap.init('dashboard-map');
-            }
+    (function() {
+      'use strict';
+
+      document.addEventListener('DOMContentLoaded', function() {
+        var container = document.getElementById('dashboard-map');
+        if (container) {
+          window.RMMMap.init('dashboard-map');
+        }
+      });
+
+      RMMAuth.onReady(function(athlete) {
+        if (!athlete) return;
+
+        // Personalise welcome
+        var welcome = document.getElementById('dash-welcome');
+        if (welcome && athlete.first_name) {
+          welcome.textContent = 'Welcome back, ' + athlete.first_name;
+        }
+
+        // Load RPS
+        loadDashRPS(athlete);
+
+        // Load recent activities
+        loadDashActivities();
+      });
+
+      function loadDashRPS(athlete) {
+        var body = document.getElementById('dash-rps-body');
+
+        fetch('/api/python/calculate-rps', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ athlete_id: String(athlete.strava_id) })
+        })
+        .then(function(res) {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        })
+        .then(function(data) {
+          var result = data.result || data.layer3_overall || null;
+          if (!result && data.layer1) {
+            result = data.layer1.trail || data.layer1.road || data.layer1.hike;
+          }
+
+          if (!result || result.activity_count === 0) {
+            body.innerHTML =
+              '<div style="padding: 1.5rem; text-align: center;">' +
+                '<p style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-muted); margin-bottom: 1rem;">No score yet — sync your activities</p>' +
+                '<button class="cta-btn" onclick="dashSync()" style="font-size: 0.7rem; padding: 0.5rem 1.25rem;">Sync Now</button>' +
+              '</div>';
+            return;
+          }
+
+          var rps = Math.round(result.rps || 0);
+          var level = result.level || {};
+          var levelName = level.name || 'Foundation';
+          var levelClass = 'rps-level-' + levelName.toLowerCase();
+
+          body.innerHTML =
+            '<div style="padding: 1.5rem; text-align: center;">' +
+              '<div class="rps-score-hero" style="margin-bottom: 1rem;">' +
+                '<div class="rps-score-number" style="font-size: 3rem;">' + rps + '</div>' +
+                '<div class="rps-level-badge ' + levelClass + '">' + levelName + '</div>' +
+              '</div>' +
+              '<div class="rps-level-bar" style="max-width: 200px;">' +
+                '<div class="rps-level-fill" style="width:' + rps + '%"></div>' +
+              '</div>' +
+              '<p style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-muted); margin-top: 0.75rem;">' +
+                (result.activity_count || 0) + ' activities · 90-day window' +
+              '</p>' +
+            '</div>';
+        })
+        .catch(function() {
+          body.innerHTML =
+            '<div style="padding: 1.5rem; text-align: center;">' +
+              '<p style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-muted);">Unable to load score</p>' +
+            '</div>';
         });
+      }
+
+      function loadDashActivities() {
+        fetch('/api/auth/strava-activities?per_page=5', { credentials: 'same-origin' })
+          .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function(data) {
+            if (!data.activities || data.activities.length === 0) return;
+
+            var scroll = document.querySelector('.dash-activity-scroll');
+            if (!scroll) return;
+
+            scroll.innerHTML = '';
+
+            data.activities.forEach(function(a) {
+              var distKm = (a.distance / 1000).toFixed(2);
+              var paceTotal = a.distance > 0 ? (a.moving_time / (a.distance / 1000)) : 0;
+              var paceMin = Math.floor(paceTotal / 60);
+              var paceSec = Math.round(paceTotal % 60);
+              var paceStr = paceMin + ':' + (paceSec < 10 ? '0' : '') + paceSec;
+              var elev = Math.round(a.total_elevation_gain || 0);
+              var timeMin = Math.floor(a.moving_time / 60);
+              var timeH = Math.floor(timeMin / 60);
+              var timeM = timeMin % 60;
+              var timeStr = timeH > 0 ? timeH + ':' + (timeM < 10 ? '0' : '') + timeM + ':00' : timeM + ':' + (Math.round(a.moving_time % 60) < 10 ? '0' : '') + Math.round(a.moving_time % 60);
+
+              var card = document.createElement('div');
+              card.className = 'dash-activity-card';
+              card.innerHTML =
+                '<div class="dash-activity-header">' +
+                  '<h3 class="dash-activity-name">' + escapeHtml(a.name || 'Activity') + '</h3>' +
+                  '<p class="dash-activity-grade">' + (a.sport_type || a.type || '') + '</p>' +
+                '</div>' +
+                '<div class="dash-activity-body">' +
+                  '<div class="dash-activity-stats">' +
+                    '<div class="dash-stat"><span class="dash-stat-label">Distance</span><span class="dash-stat-value">' + distKm + 'km</span></div>' +
+                    '<div class="dash-stat"><span class="dash-stat-label">Pace</span><span class="dash-stat-value">' + paceStr + '</span></div>' +
+                    '<div class="dash-stat"><span class="dash-stat-label">Elevation</span><span class="dash-stat-value">' + elev + 'm</span></div>' +
+                    '<div class="dash-stat"><span class="dash-stat-label">Time</span><span class="dash-stat-value">' + timeStr + '</span></div>' +
+                  '</div>' +
+                '</div>';
+              scroll.appendChild(card);
+            });
+          })
+          .catch(function() {
+            // Silent fail — keep placeholder content
+          });
+      }
+
+      window.dashSync = function() {
+        var btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Syncing...';
+        fetch('/api/auth/sync-activities', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ days: 90 })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function() { window.location.reload(); })
+        .catch(function() { btn.textContent = 'Sync failed'; btn.disabled = false; });
+      };
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+    })();
     </script>
 </body>
 </html>

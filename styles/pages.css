@@ -1370,6 +1370,272 @@
     border-top: 1px solid rgba(23, 26, 20, 0.1);
 }
 
+/* CTA Button */
+.cta-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: var(--color-dark);
+    color: var(--color-white);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 1.5rem;
+}
+
+.cta-btn:hover:not(:disabled) {
+    background: var(--color-accent);
+}
+
+.cta-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* --- RPS Live Score Display --- */
+.rps-loading {
+    padding: 2rem 0;
+}
+
+.rps-score-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.rps-score-number {
+    font-family: var(--font-mono);
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    line-height: 1;
+}
+
+.rps-level-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 1rem;
+    border: 1px solid rgba(23, 26, 20, 0.2);
+    color: var(--color-dark);
+}
+
+.rps-level-foundation { border-color: rgba(23, 26, 20, 0.3); color: var(--color-muted); }
+.rps-level-active { border-color: #4A7B6B; color: #4A7B6B; }
+.rps-level-athlete { border-color: #6B4A9E; color: #6B4A9E; }
+.rps-level-competitor { border-color: #D4A017; color: #D4A017; }
+.rps-level-elite { border-color: var(--color-accent); color: var(--color-accent); }
+
+.rps-level-bar {
+    max-width: 400px;
+    height: 6px;
+    background: rgba(23, 26, 20, 0.08);
+    margin: 0 auto 1rem;
+    overflow: hidden;
+}
+
+.rps-level-fill {
+    height: 100%;
+    background: var(--color-accent);
+    transition: width 0.6s ease;
+}
+
+.rps-level-desc {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    margin: 0 0 2rem 0;
+}
+
+.rps-components {
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+    text-align: left;
+}
+
+.rps-comp-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+}
+
+.rps-comp-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    width: 130px;
+    flex-shrink: 0;
+    text-align: right;
+}
+
+.rps-comp-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(23, 26, 20, 0.06);
+    overflow: hidden;
+}
+
+.rps-comp-fill {
+    height: 100%;
+    background: var(--color-dark);
+    transition: width 0.4s ease;
+}
+
+.rps-comp-score {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    width: 30px;
+    text-align: right;
+}
+
+.rps-meta {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-muted);
+    margin: 0;
+}
+
+/* --- Race Readiness Live Display --- */
+.readiness-route-selector {
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
+
+.readiness-select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    border: 1px solid rgba(23, 26, 20, 0.2);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--color-dark);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23171A14' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+}
+
+.readiness-verdict-banner {
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 2px solid;
+}
+
+.readiness-verdict-banner.verdict-ready {
+    border-color: #4A7B4A;
+    background: rgba(74, 123, 74, 0.05);
+}
+
+.readiness-verdict-banner.verdict-close {
+    border-color: #D4A017;
+    background: rgba(212, 160, 23, 0.05);
+}
+
+.readiness-verdict-banner.verdict-notyet {
+    border-color: var(--color-accent);
+    background: rgba(255, 78, 80, 0.05);
+}
+
+.readiness-verdict-text {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin: 0 0 0.5rem 0;
+}
+
+.readiness-verdict-summary {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin: 0;
+}
+
+.readiness-checks-live {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.readiness-check-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(23, 26, 20, 0.08);
+}
+
+.readiness-check-status {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.5rem;
+    width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.readiness-check-pass {
+    background: rgba(74, 123, 74, 0.1);
+    color: #4A7B4A;
+    border: 1px solid rgba(74, 123, 74, 0.3);
+}
+
+.readiness-check-fail {
+    background: rgba(255, 78, 80, 0.08);
+    color: var(--color-accent);
+    border: 1px solid rgba(255, 78, 80, 0.3);
+}
+
+.readiness-check-info {
+    flex: 1;
+}
+
+.readiness-check-name {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    margin: 0 0 0.25rem 0;
+}
+
+.readiness-check-progress {
+    width: 100%;
+    height: 4px;
+    background: rgba(23, 26, 20, 0.08);
+    overflow: hidden;
+    margin-top: 0.4rem;
+}
+
+.readiness-check-progress-fill {
+    height: 100%;
+    background: var(--color-dark);
+    transition: width 0.4s ease;
+}
+
+.readiness-check-pct {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--color-dark);
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
 /* Sub-page responsive */
 @media (max-width: 768px) {
     .component-grid,

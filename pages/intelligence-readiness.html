@@ -91,15 +91,196 @@
                 </div>
             </div>
 
-            <!-- Section 4: CTA -->
-            <div class="section section-cta">
+            <!-- Section 4: Live Readiness Check (logged in) -->
+            <div class="section section-cta" id="readiness-live-section" style="display: none;">
+                <h2 class="section-heading">Check your readiness</h2>
+                <p class="section-body">Select a route below to run the five checks against your training history.</p>
+
+                <div class="readiness-route-selector">
+                    <select class="readiness-select" id="route-selector">
+                        <option value="">— Select a target route —</option>
+                    </select>
+                </div>
+
+                <div id="readiness-loading" style="display: none;">
+                    <p class="section-body">Assessing readiness...</p>
+                </div>
+
+                <div id="readiness-result" style="display: none;">
+                    <div class="readiness-verdict-banner" id="readiness-verdict">
+                        <p class="readiness-verdict-text" id="readiness-verdict-text"></p>
+                        <p class="readiness-verdict-summary" id="readiness-verdict-summary"></p>
+                    </div>
+                    <div class="readiness-checks-live" id="readiness-checks"></div>
+                </div>
+
+                <div id="readiness-empty" style="display: none;">
+                    <p class="section-body">No activities synced yet. Sync your Strava data first.</p>
+                    <button class="cta-btn" onclick="syncForReadiness()">Sync Activities</button>
+                </div>
+
+                <div id="readiness-error" style="display: none;">
+                    <p class="section-body">Unable to assess readiness right now. Try again later.</p>
+                </div>
+            </div>
+
+            <!-- Section 4: CTA (logged out) -->
+            <div class="section section-cta" id="readiness-cta-section">
                 <h2 class="section-heading">Pick a target route and find out</h2>
-                <p class="section-body">Select any graded Peninsula route and see exactly where your training stands.</p>
-                <span class="coming-soon-badge">Coming Soon</span>
+                <p class="section-body">Connect your Strava account and see exactly where your training stands.</p>
+                <button class="cta-btn" onclick="RMMAuth.login('/intelligence/readiness')">Connect Strava</button>
             </div>
 
         </div>
     </div>
     <script src="/scripts/components.js"></script>
+    <script src="/scripts/auth.js"></script>
+    <script>
+    (function() {
+      'use strict';
+
+      var liveSection = document.getElementById('readiness-live-section');
+      var ctaSection = document.getElementById('readiness-cta-section');
+      var routeSelector = document.getElementById('route-selector');
+      var _athlete = null;
+
+      // Route metadata (from validated GeoJSON routes)
+      var ROUTES = [
+        { id: 'elsies-peak-route-1', name: "Elsie's Peak — Route 1", file: 'Elsies-Peak-Route-1.geojson' },
+        { id: 'elsies-peak-route-2', name: "Elsie's Peak — Route 2", file: 'Elsies-Peak-Route-2.geojson' },
+        { id: 'elsies-peak-route-3', name: "Elsie's Peak — Route 3", file: 'Elsies-Peak-Route-3.geojson' },
+        { id: 'silvermine-lower-route-2', name: "Silvermine Lower — Route 2", file: 'Silvermine-Lower-Route-2.geojson' },
+        { id: 'silvermine-lower-route-3', name: "Silvermine Lower — Route 3", file: 'Silvermine-Lower-Route-3.geojson' },
+        { id: 'silvermine-lower-route-4', name: "Silvermine Lower — Route 4", file: 'Silvermine-Lower-Route-4.geojson' },
+        { id: 'silvermine-lower-route-5', name: "Silvermine Lower — Route 5", file: 'Silvermine-Lower-Route-5.geojson' }
+      ];
+
+      // Populate route selector
+      ROUTES.forEach(function(route) {
+        var opt = document.createElement('option');
+        opt.value = route.id;
+        opt.textContent = route.name;
+        routeSelector.appendChild(opt);
+      });
+
+      RMMAuth.onReady(function(athlete) {
+        if (athlete) {
+          _athlete = athlete;
+          liveSection.style.display = '';
+          ctaSection.style.display = 'none';
+        } else {
+          liveSection.style.display = 'none';
+          ctaSection.style.display = '';
+        }
+      });
+
+      routeSelector.addEventListener('change', function() {
+        var routeId = routeSelector.value;
+        if (!routeId || !_athlete) return;
+        runReadinessCheck(routeId);
+      });
+
+      function runReadinessCheck(routeId) {
+        var loading = document.getElementById('readiness-loading');
+        var result = document.getElementById('readiness-result');
+        var error = document.getElementById('readiness-error');
+
+        loading.style.display = '';
+        result.style.display = 'none';
+        error.style.display = 'none';
+
+        var url = '/api/python/race-readiness?route_id=' +
+          encodeURIComponent(routeId) +
+          '&athlete_id=' + encodeURIComponent(String(_athlete.strava_id));
+
+        fetch(url, { credentials: 'same-origin' })
+          .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function(data) {
+            loading.style.display = 'none';
+            renderReadiness(data);
+            result.style.display = '';
+          })
+          .catch(function(err) {
+            console.error('RMM: Readiness check error:', err);
+            loading.style.display = 'none';
+            error.style.display = '';
+          });
+      }
+
+      function renderReadiness(data) {
+        var verdict = data.verdict || 'NOT YET';
+        var banner = document.getElementById('readiness-verdict');
+        var verdictText = document.getElementById('readiness-verdict-text');
+        var verdictSummary = document.getElementById('readiness-verdict-summary');
+
+        // Set verdict styling
+        banner.className = 'readiness-verdict-banner';
+        if (verdict === 'READY') banner.classList.add('verdict-ready');
+        else if (verdict === 'CLOSE') banner.classList.add('verdict-close');
+        else banner.classList.add('verdict-notyet');
+
+        verdictText.textContent = verdict;
+        verdictText.style.color = verdict === 'READY' ? '#4A7B4A' :
+                                   verdict === 'CLOSE' ? '#D4A017' : 'var(--color-accent)';
+        verdictSummary.textContent = (data.checks_passed || 0) + ' of ' + (data.checks_total || 5) + ' checks passed';
+
+        // Render checks
+        var container = document.getElementById('readiness-checks');
+        container.innerHTML = '';
+
+        var checks = data.checks || [];
+        checks.forEach(function(check) {
+          var row = document.createElement('div');
+          row.className = 'readiness-check-row';
+
+          var passed = check.status === 'PASS';
+          var pct = Math.min(Math.round(check.progress_pct || 0), 100);
+
+          row.innerHTML =
+            '<span class="readiness-check-status ' + (passed ? 'readiness-check-pass' : 'readiness-check-fail') + '">' +
+              (passed ? 'PASS' : 'FAIL') +
+            '</span>' +
+            '<div class="readiness-check-info">' +
+              '<p class="readiness-check-name">' + (check.check || '') + '</p>' +
+              '<div class="readiness-check-progress">' +
+                '<div class="readiness-check-progress-fill" style="width:' + pct + '%;background:' + (passed ? '#4A7B4A' : 'var(--color-accent)') + '"></div>' +
+              '</div>' +
+            '</div>' +
+            '<span class="readiness-check-pct">' + pct + '%</span>';
+
+          container.appendChild(row);
+        });
+      }
+
+      window.syncForReadiness = function() {
+        var btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Syncing...';
+
+        fetch('/api/auth/sync-activities', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ days: 90 })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.synced > 0) {
+            window.location.reload();
+          } else {
+            btn.textContent = 'No new activities found';
+            setTimeout(function() { btn.disabled = false; btn.textContent = 'Sync Activities'; }, 3000);
+          }
+        })
+        .catch(function() {
+          btn.textContent = 'Sync failed — try again';
+          btn.disabled = false;
+        });
+      };
+    })();
+    </script>
 </body>
 </html>
