@@ -135,3 +135,13 @@ module.exports = async function handler(req, res) {
     'HttpOnly',
     'SameSite=Lax',
     `Max-Age=${60 * 60 * 24 * 30}` // 30 days
+  ];
+
+  if (isProduction) {
+    cookieFlags.push('Secure');
+  }
+
+  res.setHeader('Set-Cookie', cookieFlags.join('; '));
+  res.writeHead(302, { Location: returnTo });
+  res.end();
+};
