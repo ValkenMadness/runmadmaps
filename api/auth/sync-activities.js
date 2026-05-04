@@ -101,11 +101,10 @@ module.exports = async function handler(req, res) {
   // --- Parse request body ---
   let body = {};
   try {
-    const contentLength = parseInt(req.headers['content-length'] || '0');
-    if (contentLength > 0) {
-      const chunks = [];
-      for await (const chunk of req) { chunks.push(chunk); }
-      body = JSON.parse(Buffer.concat(chunks).toString());
+    if (req.body && typeof req.body === 'object') {
+      body = req.body;
+    } else if (req.body && typeof req.body === 'string') {
+      body = JSON.parse(req.body);
     }
   } catch (e) {
     // Empty body is fine — use defaults
