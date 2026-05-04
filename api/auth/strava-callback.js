@@ -2,18 +2,9 @@
  * GET /api/auth/strava-callback
  *
  * Handles Strava OAuth callback after user authorizes (or denies).
- *
- * Flow:
- *   1. Strava redirects here with ?code=XXX&scope=YYY&state=ZZZ
- *   2. Exchange code for access_token + refresh_token via Strava token endpoint
- *   3. Upsert athlete record in Supabase (profile + tokens)
- *   4. Generate session token, store in Supabase, set httpOnly cookie
- *   5. Redirect to returnTo page (from state param, default /dashboard)
- *
- * On denial: Strava redirects with ?error=access_denied — redirect to home with message.
  */
 
-const crypto = require('crypto');
+var crypto = require('crypto');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -21,31 +12,28 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // --- Check for denial ---
   if (req.query.error) {
     return res.writeHead(302, { Location: '/map?auth=denied' }).end();
   }
 
-  // --- Validate required params ---
-  const { code, scope } = req.query;
+  var code = req.query.code;
+  var scope = req.query.scope;
   if (!code) {
     return res.status(400).json({ error: 'Missing authorization code' });
   }
 
-  const returnTo = req.query.state ? decodeURIComponent(req.query.state) : '/dashboard';
+  var returnTo = req.query.state ? decodeURIComponent(req.query.state) : '/dashboard';
 
-  // --- Exchange code for tokens ---
-  const clientId = process.env.strava_oauth_client_id;
-  const clientSecret = process.env.strava_oauth_client_secret;
+  var clientId = process.env.strava_oauth_client_id;
+  var clientSecret = process.env.strava_oauth_client_secret;
 
   if (!clientId || !clientSecret) {
-    console.error('RMM: Strava OAuth credentials not configured');
     return res.status(500).json({ error: 'OAuth not configured' });
   }
 
-  let tokenData;
+  var tokenData;
   try {
-    const tokenRes = await fetch('https://www.strava.com/oauth/token', {
+    var tokenRes = await fetch('https://www.strava.com/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -57,23 +45,19 @@ module.exports = async function handler(req, res) {
     });
 
     if (!tokenRes.ok) {
-      const errBody = await tokenRes.text();
-      console.error('RMM: Strava token exchange failed:', tokenRes.status, errBody);
       return res.writeHead(302, { Location: '/map?auth=error' }).end();
     }
 
     tokenData = await tokenRes.json();
   } catch (err) {
-    console.error('RMM: Strava token exchange error:', err);
     return res.writeHead(302, { Location: '/map?auth=error' }).end();
   }
 
-  // --- Extract athlete data from Strava response ---
-  const athlete = tokenData.athlete || {};
-  const now = new Date().toISOString();
-  const sessionToken = crypto.randomUUID();
+  var athlete = tokenData.athlete || {};
+  var now = new Date().toISOString();
+  var sessionToken = crypto.randomUUID();
 
-  const athleteRecord = {
+  var athleteRecord = {
     strava_id: athlete.id,
     first_name: athlete.firstname || null,
     last_name: athlete.lastname || null,
@@ -90,25 +74,22 @@ module.exports = async function handler(req, res) {
     updated_at: now
   };
 
-  // --- Upsert athlete in Supabase ---
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  var supabaseUrl = process.env.SUPABASE_URL;
+  var supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    console.error('RMM: Supabase credentials not configured');
     return res.status(500).json({ error: 'Database not configured' });
   }
 
   try {
-    // Upsert: insert if new, update if existing (on strava_id conflict)
-    const upsertRes = await fetch(
-      `${supabaseUrl}/rest/v1/athletes?on_conflict=strava_id`,
+    var upsertRes = await fetch(
+      supabaseUrl + '/rest/v1/athletes?on_conflict=strava_id',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
+          'Authorization': 'Bearer ' + supabaseKey,
           'Prefer': 'resolution=merge-duplicates'
         },
         body: JSON.stringify(athleteRecord)
@@ -116,32 +97,37 @@ module.exports = async function handler(req, res) {
     );
 
     if (!upsertRes.ok) {
-      const errBody = await upsertRes.text();
-      console.error('RMM CALLBACK: Supabase upsert HTTP ' + upsertRes.status);
-      console.error('RMM CALLBACK: ' + errBody);
-      console.error('RMM CALLBACK: URL was ' + supabaseUrl + '/rest/v1/athletes');
-      return res.writeHead(302, { Location: '/map?auth=db_error&status=' + upsertRes.status }).end();
+      var errBody = await upsertRes.text();
+      return res.status(200).json({
+        debug: true,
+        error: 'Supabase upsert failed',
+        http_status: upsertRes.status,
+        supabase_error: errBody,
+        hint: upsertRes.status === 404
+          ? 'The athletes table does not exist. Run supabase_athletes_migration.sql in Supabase SQL Editor.'
+          : 'Check the supabase_error field for details.'
+      });
     }
   } catch (err) {
-    console.error('RMM CALLBACK: Supabase upsert exception: ' + (err.message || err));
-    return res.writeHead(302, { Location: '/map?auth=db_error' }).end();
+    return res.status(200).json({
+      debug: true,
+      error: 'Supabase upsert exception',
+      message: err.message || String(err)
+    });
   }
 
-  // --- Set session cookie and redirect ---
-  const isProduction = (req.headers['x-forwarded-host'] || req.headers.host || '').includes('runmadmaps.com');
-  const cookieFlags = [
-    `rmm_session=${sessionToken}`,
-    'Path=/',
-    'HttpOnly',
-    'SameSite=Lax',
-    `Max-Age=${60 * 60 * 24 * 30}` // 30 days
-  ];
-
+  var isProduction = (req.headers['x-forwarded-host'] || req.headers.host || '').includes('runmadmaps.com');
+  var cookieParts = [];
+  cookieParts.push('rmm_session=' + sessionToken);
+  cookieParts.push('Path=/');
+  cookieParts.push('HttpOnly');
+  cookieParts.push('SameSite=Lax');
+  cookieParts.push('Max-Age=2592000');
   if (isProduction) {
-    cookieFlags.push('Secure');
+    cookieParts.push('Secure');
   }
 
-  res.setHeader('Set-Cookie', cookieFlags.join('; '));
+  res.setHeader('Set-Cookie', cookieParts.join('; '));
   res.writeHead(302, { Location: returnTo });
   res.end();
 };
