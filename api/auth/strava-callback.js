@@ -117,11 +117,13 @@ module.exports = async function handler(req, res) {
 
     if (!upsertRes.ok) {
       const errBody = await upsertRes.text();
-      console.error('RMM: Supabase upsert failed:', upsertRes.status, errBody);
-      return res.writeHead(302, { Location: '/map?auth=db_error' }).end();
+      console.error('RMM CALLBACK: Supabase upsert HTTP ' + upsertRes.status);
+      console.error('RMM CALLBACK: ' + errBody);
+      console.error('RMM CALLBACK: URL was ' + supabaseUrl + '/rest/v1/athletes');
+      return res.writeHead(302, { Location: '/map?auth=db_error&status=' + upsertRes.status }).end();
     }
   } catch (err) {
-    console.error('RMM: Supabase upsert error:', err);
+    console.error('RMM CALLBACK: Supabase upsert exception: ' + (err.message || err));
     return res.writeHead(302, { Location: '/map?auth=db_error' }).end();
   }
 
@@ -133,13 +135,3 @@ module.exports = async function handler(req, res) {
     'HttpOnly',
     'SameSite=Lax',
     `Max-Age=${60 * 60 * 24 * 30}` // 30 days
-  ];
-
-  if (isProduction) {
-    cookieFlags.push('Secure');
-  }
-
-  res.setHeader('Set-Cookie', cookieFlags.join('; '));
-  res.writeHead(302, { Location: returnTo });
-  res.end();
-};
