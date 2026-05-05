@@ -97,23 +97,12 @@ module.exports = async function handler(req, res) {
     );
 
     if (!upsertRes.ok) {
-      var errBody = await upsertRes.text();
-      return res.status(200).json({
-        debug: true,
-        error: 'Supabase upsert failed',
-        http_status: upsertRes.status,
-        supabase_error: errBody,
-        hint: upsertRes.status === 404
-          ? 'The athletes table does not exist. Run supabase_athletes_migration.sql in Supabase SQL Editor.'
-          : 'Check the supabase_error field for details.'
-      });
+      console.error('RMM CALLBACK: Supabase upsert failed:', upsertRes.status, await upsertRes.text());
+      return res.writeHead(302, { Location: '/map?auth=error' }).end();
     }
   } catch (err) {
-    return res.status(200).json({
-      debug: true,
-      error: 'Supabase upsert exception',
-      message: err.message || String(err)
-    });
+    console.error('RMM CALLBACK: Supabase upsert exception:', err.message || String(err));
+    return res.writeHead(302, { Location: '/map?auth=error' }).end();
   }
 
   var isProduction = (req.headers['x-forwarded-host'] || req.headers.host || '').includes('runmadmaps.com');
