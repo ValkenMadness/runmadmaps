@@ -137,6 +137,29 @@ class handler(BaseHTTPRequestHandler):
 
             activities = [_merge_activity(r) for r in rows]
 
+            # --- Early return if no activities (avoids needing formula env vars) ---
+            if not activities:
+                now_str = reference_date.strftime("%Y-%m-%dT%H:%M:%SZ")
+                empty_score = {"rps": 0, "activity_count": 0, "level": {"name": "Foundation", "floor": 0, "ceiling": 20, "position_pct": 0}}
+                if activity_type:
+                    return self._send_json(200, {
+                        "athlete_id": athlete_id,
+                        "activity_type": activity_type,
+                        "reference_date": now_str,
+                        "result": empty_score,
+                    })
+                else:
+                    return self._send_json(200, {
+                        "athlete_id": athlete_id,
+                        "reference_date": now_str,
+                        "layer1": {
+                            "road": empty_score,
+                            "trail": empty_score,
+                            "hike": empty_score,
+                        },
+                        "layer3_overall": empty_score,
+                    })
+
             # --- Run RPS Engine ---
             engine = RPSEngine()
             now_str = reference_date.strftime("%Y-%m-%dT%H:%M:%SZ")
